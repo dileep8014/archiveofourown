@@ -1,0 +1,466 @@
+definitions:
+  app.Pager:
+    properties:
+      page:
+        example: 1
+        type: integer
+      pageSize:
+        example: 10
+        type: integer
+      totalRows:
+        example: 100
+        type: integer
+    type: object
+  errcode.Error:
+    properties:
+      code:
+        type: integer
+      details:
+        items:
+          type: string
+        type: array
+      msg:
+        type: string
+    type: object
+  model.Article:
+    properties:
+      chapterNums:
+        example: 100
+        format: int64
+        type: integer
+      chapterRealNums:
+        example: 100
+        format: int64
+        type: integer
+      createdAt:
+        example: "2000-01-01 00:00:00"
+        format: datetime
+        type: string
+      downloadNums:
+        example: 100
+        format: int64
+        type: integer
+      id:
+        example: 1
+        format: int64
+        type: integer
+      language:
+        example: 1
+        type: integer
+      markId:
+        example: 1
+        format: int64
+        type: integer
+      shareNums:
+        example: 100
+        format: int64
+        type: integer
+      subTitle:
+        example: desc about article
+        type: string
+      talkNums:
+        example: 100
+        format: int64
+        type: integer
+      title:
+        example: article title
+        type: string
+      updatedAt:
+        example: "2000-01-01 00:00:00"
+        format: datetime
+        type: string
+      userId:
+        example: 1
+        format: int64
+        type: integer
+      viewNums:
+        example: 100
+        format: int64
+        type: integer
+      words:
+        example: 1000
+        format: int64
+        type: integer
+    type: object
+  model.ArticleSwagger:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/model.Article'
+        type: array
+      pager:
+        $ref: '#/definitions/app.Pager'
+        type: object
+    type: object
+  model.Category:
+    properties:
+      id:
+        example: 1
+        format: int64
+        type: integer
+      name:
+        example: category name
+        type: string
+    type: object
+  service.AuthResponse:
+    properties:
+      token:
+        example: token string
+        type: string
+    type: object
+  service.CategoryRequest:
+    properties:
+      name:
+        example: category name
+        type: string
+    required:
+    - name
+    type: object
+info:
+  contact: {}
+  description: 属于国内的同人圈
+  license: {}
+  termsOfService: https://github.com/shyptr/archiveofourown
+  title: 同人圈
+  version: "1.0"
+paths:
+  /api/v1/articles:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 查询内容
+        in: query
+        maxLength: 100
+        name: query
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/model.ArticleSwagger'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 获取文章列表
+      tags:
+      - 文章
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 标题
+        in: body
+        maxLength: 100
+        name: title
+        required: true
+        schema:
+          type: string
+      - description: 简述
+        in: body
+        maxLength: 100
+        name: subTitle
+        required: true
+        schema:
+          type: string
+      - description: 书签ID
+        in: body
+        name: markID
+        schema:
+          type: integer
+      - default: 1
+        description: 语言
+        enum:
+        - 1
+        - 2
+        in: body
+        name: language
+        required: true
+        schema:
+          type: integer
+      - description: 计划章节数
+        in: body
+        name: chapterNums
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/model.Article'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 创建文章
+      tags:
+      - 文章
+  /api/v1/articles/{id}:
+    delete:
+      parameters:
+      - description: 文章ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 删除文章
+      tags:
+      - 文章
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 文章ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/model.Article'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 获取文章信息
+      tags:
+      - 文章
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 文章ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 标题
+        in: body
+        maxLength: 100
+        name: title
+        required: true
+        schema:
+          type: string
+      - description: 简述
+        in: body
+        maxLength: 100
+        name: subTitle
+        required: true
+        schema:
+          type: string
+      - description: 书签ID
+        in: body
+        name: markID
+        schema:
+          type: integer
+      - default: 1
+        description: 语言
+        enum:
+        - 1
+        - 2
+        in: body
+        name: language
+        required: true
+        schema:
+          type: integer
+      - description: 计划章节数
+        in: body
+        name: chapterNums
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/model.Article'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 修改文章信息
+      tags:
+      - 文章
+  /api/v1/category:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            items:
+              $ref: '#/definitions/model.Category'
+            type: array
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 获取所有分类
+      tags:
+      - 分类
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 分类
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/service.CategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/model.Category'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 创建分类
+      tags:
+      - 分类
+  /api/v1/category/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 分类ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 删除分类
+      tags:
+      - 分类
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 分类ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 分类
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/service.CategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/model.Category'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 修改分类
+      tags:
+      - 分类
+  /auth:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 用户ID
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/service.AuthResponse'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 获取token
+      tags:
+      - Auth
+swagger: "2.0"
