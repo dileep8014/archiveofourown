@@ -27,11 +27,11 @@ JWT:
 Email:
   Host: smtp.qq.com
   Port: 465
-  UserName: 3200828584@qq.com
-  Password: muyi2144!
+  UserName: xxxx@qq.com
+  Password: xxxx
   IsSSL: true
-  From: 3200828584@qq.com
+  From: xxxx@qq.com
   To:
-    - 3200828584@qq.com
-    - shyptr14@gmail.com
+    - xxxx@qq.com
+    - xxxx@gmail.com
 
