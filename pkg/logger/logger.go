@@ -56,7 +56,7 @@ func SetupLogger() {
 			}
 		})
 		pool.New = func() interface{} {
-			return zerolog.New(consoleWriter).Level(zerolog.DebugLevel).With().Timestamp().Logger()
+			return zerolog.New(consoleWriter).Level(zerolog.DebugLevel).With().Timestamp().Logger().With().Caller().Logger()
 		}
 	})
 }

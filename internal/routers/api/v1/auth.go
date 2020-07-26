@@ -36,7 +36,7 @@ func (a Auth) Get(c *gin.Context) {
 	res := app.NewResponse(c)
 	cookie, err := c.Cookie("me")
 	if err != nil && err != http.ErrNoCookie {
-		logger.Error().Caller().AnErr("auth.get", err).Send()
+		logger.Error().AnErr("auth.get", err).Send()
 		res.ToErrorResponse(errcode.UnauthorizedTokenError)
 		return
 	}
@@ -50,7 +50,7 @@ func (a Auth) Get(c *gin.Context) {
 	if idStr != "" {
 		i, err := strconv.Atoi(idStr)
 		if err != nil {
-			logger.Error().Caller().AnErr("auth.get", err).Send()
+			logger.Error().AnErr("auth.get", err).Send()
 			res.ToResponse(errcode.IDParseError)
 			return
 		}
@@ -58,7 +58,7 @@ func (a Auth) Get(c *gin.Context) {
 		defer svc.Finish()
 		user, err := svc.GetUser(int64(i))
 		if err != nil {
-			logger.Error().Caller().AnErr("auth.get", err).Send()
+			logger.Error().AnErr("auth.get", err).Send()
 			res.ToResponse(errcode.ErrorGetUserFail)
 			return
 		}
@@ -69,7 +69,7 @@ func (a Auth) Get(c *gin.Context) {
 	}
 	token, err := app.GenerateToken(id, username)
 	if err != nil {
-		logger.Error().Caller().AnErr("auth.get", err).Send()
+		logger.Error().AnErr("auth.get", err).Send()
 		res.ToErrorResponse(errcode.UnauthorizedTokenGenerate)
 		return
 	}
