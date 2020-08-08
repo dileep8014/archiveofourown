@@ -15,7 +15,7 @@ func Jwt() gin.HandlerFunc {
 			token string
 			ecode = errcode.Success
 		)
-		token, _ = c.Cookie("me")
+		token = c.GetHeader("x-auth-token")
 		if token == "" {
 			ecode = errcode.InValidParams
 		} else {
@@ -42,5 +42,6 @@ func Jwt() gin.HandlerFunc {
 			return
 		}
 		c.Next()
+		c.Header("x-auth-token", token)
 	}
 }

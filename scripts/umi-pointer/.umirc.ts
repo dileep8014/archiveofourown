@@ -1,7 +1,7 @@
 import { defineConfig } from 'umi';
 
 export default defineConfig({
-
+  styles: ['./src/app.css'],
   layout: {
     'navTheme': 'light',
     'layout': 'top',
@@ -11,11 +11,12 @@ export default defineConfig({
     'menu': {
       'locale': true,
     },
-    'logo': '',
-    'title': 'Ant Design Pro',
+    'logo': 'https://img.alicdn.com/tfs/TB1zomHwxv1gK0jSZFFXXb0sXXa-200-200.png',
+    'title': 'Pointer',
     'pwa': false,
     'iconfontUrl': '',
     'splitMenus': false,
+    'contentStyle': { backgroundColor: 'white',padding:30 },
   },
   antd: {
     dark: false,
@@ -29,10 +30,23 @@ export default defineConfig({
     type: 'none',
   },
   theme: {
-    'primary-color': '#FA541C',
-    'link-color': '#FA541C',
+    'primary-color': '#ffe072',
+    'link-color': '#ffe072',
   },
   routes: [
-    { path: '/', component: '@/pages/index', menu: { name: '首页' } },
+    { exact: true, path: '/', component: '@/pages/index' },
+    {
+      menu: { name: '同人圈' }, routes: [
+        { path: '/category', menu: { name: '所有同人' } },
+        { path: '/category/Comic and Animation', menu: { name: '动漫' } },
+        { path: '/category/Book and Literature', menu: { name: '文学' } },
+        { path: '/category/Film and Television', menu: { name: '影视' } },
+        { path: '/category/Drama', menu: { name: '戏剧' } },
+        { path: '/category/Music', menu: { name: '音乐' } },
+        { path: '/category/Game', menu: { name: '游戏' } },
+        { path: '/category/Other', menu: { name: '其他' } },
+        { path: '/category/Original', menu: { name: '原创' } },
+      ],
+    },
   ],
 });

@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/shyptr/archiveofourown/pkg/app"
 	"github.com/shyptr/archiveofourown/pkg/errwrap"
 	"github.com/shyptr/sqlex"
 	"time"
@@ -33,8 +32,8 @@ type Article struct {
 
 // Article list example
 type ArticleSwagger struct {
-	List  []Article  `json:"list"`
-	Pager *app.Pager `json:"pager"`
+	List  []Article `json:"list"`
+	Total int       `json:"total"`
 }
 
 func (a Article) Create(tx sqlex.BaseRunner) (article Article, err error) {

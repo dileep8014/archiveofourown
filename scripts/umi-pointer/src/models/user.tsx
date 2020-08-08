@@ -1,55 +1,58 @@
-import { Effect, ImmerReducer, Reducer, Subscription } from 'umi';
-import * as apis from '@/component/api.tsx';
+import { useCallback, useEffect, useState } from 'react';
+import service from '@/component/service';
+import { message } from 'antd';
+import { useRequest } from '@umijs/hooks';
 
-export interface UserModelState {
+export type UserModelState = {
   id: number,
   name: string,
   email: string,
-}
+  avatar: string,
+  root: boolean,
+} | null
 
-export interface UserModelType {
-  state: UserModelState;
-  effects: {
-    query: Effect;
+export default function useCurrentUserModel(): { user: UserModelState, signin: (account: string, password: string) => void, signout: () => void } {
+  const [user, setUser] = useState(null);
+
+  const { data, error, refresh } = useRequest(service.QueryCurrentUser);
+  const { run: signIn } = useRequest(service.SignIn, {
+    manual: true, onSuccess: res => {
+      if (res == 'ok') {
+        refresh().then(r => {
+          setUser(r);
+        });
+      }
+    },
+  });
+  const { run: signOut } = useRequest(service.SignOut, {
+    manual: true, onSuccess: res => {
+      if (res == 'ok') {
+        setUser(null);
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (data) {
+      setUser(data);
+    }
+    if (error) {
+      message.error(error);
+    }
+  }, [data, error]);
+
+  const signin = useCallback((account: string, password: string) => {
+    // signin implementation
+    signIn(account, password);
+  }, []);
+
+  const signout = useCallback(() => {
+    signOut();
+  }, []);
+
+  return {
+    user,
+    signin,
+    signout,
   };
-  reducers: {
-    save: ImmerReducer<UserModelState>;
-  };
-  subscriptions: { setup: Subscription };
 }
-
-const UserModel: UserModelType = {
-
-  state: {
-    id: 0,
-    name: '',
-    email: '',
-  },
-
-  effects: {
-    * query({ payload }, { call, put }) {
-      payload = yield call(apis.QueryCurrentUser);
-      yield put({ type: 'save', payload });
-    },
-  },
-  reducers: {
-    save(state, action) {
-      state.id = action.payload.id;
-      state.name = action.payload.name;
-      state.email = action.payload.email;
-    },
-  },
-  subscriptions: {
-    setup({ dispatch, history }) {
-      return history.listen(({ pathname }) => {
-        if (pathname === '/') {
-          dispatch({
-            type: 'query',
-          });
-        }
-      });
-    },
-  },
-};
-
-export default UserModel;
