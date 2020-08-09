@@ -116,7 +116,7 @@ const service = {
       method: 'post',
     });
   },
-  SignUp: function(account: string, email: string, password: string) {
+  SignUp: async function(account: string, email: string, password: string) {
     return request('/api/v1/users/create', {
       method: 'post',
       data: { account: account, email: email, password: password },
@@ -127,6 +127,11 @@ const service = {
   },
   SubWorks: async function(params: { current: number, pageSize: number }) {
     return request('/api/v1/works/subscribe', {
+      params: params,
+    });
+  },
+  News: async function(params: { current: number, pageSize: number }) {
+    return request('/api/v1/news', {
       params: params,
     });
   },

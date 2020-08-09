@@ -1,7 +1,6 @@
 import { UserModelState } from '@/models/user';
 import mockjs, { Random } from 'mockjs';
 
-let currentUser: UserModelState = null;
 
 let users = [{
   id: 1,
@@ -11,21 +10,30 @@ let users = [{
   root: true,
 }];
 
+let currentUser: UserModelState = users[0];
+
+
 export default {
+  // news
+  'GET /api/v1/news': mockjs.mock({
+    'list|4': [{
+      'id|+1': 1,
+      title: '@ctitle',
+      createdAt: '@date',
+      comments: '@natural(0,100)',
+      description: '@cparagraph',
+    }],
+    'total': 5,
+  }),
   // works
   'GET /api/v1/works/subscribe': (req: any, res: any) => {
     let data = {
       'id|+1': 1,
       title: '@ctitle',
-      subTitle: '@csentence',
+      newChapterDesc: '@cparagraph',
       topic: '@ctitle',
       'tags|3-12': '@last',
-      words: '@natural(100,1000000)',
-      chapters: '@natural(0,1000)',
-      comments: '@natural(0,100000)',
-      collection: '@natural(0,10000)',
-      subscribe: '@natural(1,1000)',
-      hits: '@natural(10,1000000)',
+      newChapter: '第@natural(1,1000)章 @ctitle',
       user: users[Random.natural(1, users.length) - 1],
     };
     switch (req.query.pageSize) {
@@ -57,7 +65,7 @@ export default {
   },
 
   // tag
-  'GET /api/v1/topic/hots': mockjs.mock({ 'list|50-100': ['@last'] }),
+  'GET /api/v1/topic/hots': mockjs.mock({ 'list|20-40': ['@ctitle'] }),
 
   //Auth
   'GET /auth': (req: any, res: any) => {

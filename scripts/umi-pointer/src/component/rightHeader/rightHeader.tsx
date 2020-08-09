@@ -1,109 +1,126 @@
-import React, { useState } from 'react';
-import { useModel } from 'umi';
-import { Avatar, Button, Checkbox, Dropdown, Form, Input, Menu, Modal } from 'antd';
-import NProgress from 'nprogress';
-import 'nprogress/nprogress.css';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import React, { useRef, useState } from 'react';
+import { useModel, Link } from 'umi';
+import { AutoComplete, Avatar, Button, Dropdown, Input, Menu, Modal } from 'antd';
 import styles from './rightHeader.less';
+import { SelectProps } from 'antd/es/select';
+import SignForm from '@/component/sign/sign';
+
+function getRandomInt(max: number, min: number = 0) {
+  return Math.floor(Math.random() * (max - min + 1)) + min; // eslint-disable-line no-mixed-operators
+}
+
+const searchResult = (query: string) => {
+  return new Array(getRandomInt(5))
+    .join('.')
+    .split('.')
+    .map((item, idx) => {
+      const category = `${query}${idx}`;
+      return {
+        value: category,
+        label: (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+            }}
+          >
+            <span>
+              Found {query} on{' '}
+              <a
+                href={`https://s.taobao.com/search?q=${query}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {category}
+              </a>
+            </span>
+            <span>{getRandomInt(200, 100)} results</span>
+          </div>
+        ),
+      };
+    });
+};
 
 const RightHeader: React.FC = () => {
 
-  const { user, signIn, signOut } = useModel('user', model => ({
+  const { user, signOut } = useModel('user', model => ({
     user: model.user,
-    signIn: model.signin,
     signOut: model.signout,
   }));
 
-  const [loginVisible, setLoginVisible] = useState(false);
-  const [registerVisible, setRegisterVisible] = useState(false);
-  const [top, setTop] = useState(0);
+  const [canVisit, setCanVisit] = useState(false);
+  const [tab, setTab] = useState('signIn');
 
-  const onFinish = (values: any) => {
-    if (values.rememberme === undefined) {
-      values.rememberme = false;
+  const visit = (login: boolean | null, cancel?: boolean) => {
+    if (cancel !== undefined && cancel) {
+      setCanVisit(false);
     }
-    NProgress.start();
-    signIn(values.username, values.password);
-    NProgress.done();
-  };
-
-  const visit = () => {
-    if (!loginVisible) {
-      setTop(100);
-      setLoginVisible(true);
-    } else {
-      setTop(0);
-      setLoginVisible(false);
+    if (login !== null) {
+      if (login) {
+        setTab('signIn');
+      } else {
+        setTab('signUp');
+      }
+      setCanVisit(true);
     }
   };
+
+  const [options, setOptions] = useState<SelectProps<object>['options']>([]);
+
+  const handleSearch = (value: string) => {
+    setOptions(value ? searchResult(value) : []);
+  };
+
+  const onSelect = (value: string) => {
+    console.log('onSelect', value);
+  };
+
+  const search = (
+    <AutoComplete dropdownMatchSelectWidth={152}
+                  options={options}
+                  onSelect={onSelect}
+                  onSearch={handleSearch}
+                  className={styles.search}
+    >
+      <Input.Search style={{ border: 0 }} placeholder='在Pointer中搜索' size={'middle'}/>
+    </AutoComplete>);
+
 
   if (user) {
     return (
       <div className={styles.right}>
+        {search}
         <Dropdown overlay={
           <Menu onClick={signOut}>
             <Menu.Item>登出</Menu.Item>
           </Menu>}>
-          <div className={styles.userAvatar}>
+          <Link to='/userCenter' className={styles.userAvatar}>
             <Avatar src={user?.avatar}/><span>{user?.name}</span>
-          </div>
+          </Link>
         </Dropdown>
-        <Button className={styles.createBtn}>发布</Button>
+        <Button className={styles.rightBtn}>创作中心</Button>
       </div>
     );
   }
 
   return (
-    <div>
-      <Button onClick={visit}>登录</Button>
-      <Modal
+    <div className={styles.right}>
+      {search}
+      <Button onClick={() => visit(true)} className={styles.rightBtn}>登录</Button>
+      <Button onClick={() => visit(false)} className={styles.rightBtn}>注册</Button>
+      {canVisit && <Modal
         centered={true}
-        width={600}
+        width={400}
         footer={null}
-        onCancel={visit}
-        visible={loginVisible}
+        onCancel={() => visit(null, true)}
+        visible={true}
       >
-        <LoginForm onFinish={onFinish}/>
-      </Modal>
-      <Button>注册</Button>
+        <SignForm tab={tab}/>
+      </Modal>}
     </div>
   );
 
 };
 
-const LoginForm = (props: {
-  onFinish: (value: any) => void,
-}) => {
-  const [form] = Form.useForm();
-
-  return (
-    <Form form={form} style={{ padding: 20}} name="login" initialValues={{ remember: true }} scrollToFirstError
-          onFinish={props.onFinish}>
-      <Form.Item name="username" className="input-prepend restyle" rules={
-        [{ required: true, message: '用户名不能为空' }]}>
-        <Input size={'large'} prefix={<UserOutlined className="icon"/>}
-               placeholder="用户名 / 邮箱"/>
-      </Form.Item>
-      <Form.Item name="password" className="input-prepend" rules={
-        [{ required: true, message: '密码不能为空' }]
-      }>
-        <Input.Password prefix={<LockOutlined/>} size={'large'} placeholder="Password"/>
-      </Form.Item>
-      <Form.Item>
-        <Form.Item name="rememberme" valuePropName="checked" className="remember-btn">
-          <Checkbox>记住我</Checkbox>
-        </Form.Item>
-        <div className="forgot-btn">
-          <a href="/?">
-            忘记密码
-          </a>
-        </div>
-      </Form.Item>
-      <Form.Item>
-        <Button htmlType="submit" className="login-btn">登录</Button>
-      </Form.Item>
-    </Form>
-  );
-};
 
 export default RightHeader;

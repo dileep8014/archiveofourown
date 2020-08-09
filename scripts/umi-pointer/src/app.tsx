@@ -17,6 +17,9 @@ export const layout = {
   rightRender: (initInfo: any) => {
     return <RightHeader/>;
   },
+  footerRender: () => {
+    return <div/>
+  },
 };
 
 
