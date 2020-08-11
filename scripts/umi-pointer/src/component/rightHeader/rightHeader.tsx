@@ -1,9 +1,10 @@
-import React, { useRef, useState } from 'react';
-import { useModel, Link } from 'umi';
+import React, { ReactText, useState } from 'react';
+import { useModel, history } from 'umi';
 import { AutoComplete, Avatar, Button, Dropdown, Input, Menu, Modal } from 'antd';
 import styles from './rightHeader.less';
 import { SelectProps } from 'antd/es/select';
 import SignForm from '@/component/sign/sign';
+import ProgressOpt from '@/component/progress/progress';
 
 function getRandomInt(max: number, min: number = 0) {
   return Math.floor(Math.random() * (max - min + 1)) + min; // eslint-disable-line no-mixed-operators
@@ -85,18 +86,28 @@ const RightHeader: React.FC = () => {
       <Input.Search style={{ border: 0 }} placeholder='在Pointer中搜索' size={'middle'}/>
     </AutoComplete>);
 
+  const menuSelect = (key: ReactText) => {
+    if (key === 'user') {
+      history.push('/userCenter');
+    }
+    if (key === 'out') {
+      ProgressOpt(signOut);
+    }
+  };
+
 
   if (user) {
     return (
       <div className={styles.right}>
         {search}
         <Dropdown overlay={
-          <Menu onClick={signOut}>
-            <Menu.Item>登出</Menu.Item>
+          <Menu onClick={({ key }) => menuSelect(key)}>
+            <Menu.Item key='user'>个人中心</Menu.Item>
+            <Menu.Item key='out'>登出</Menu.Item>
           </Menu>}>
-          <Link to='/userCenter' className={styles.userAvatar}>
+          <span className={styles.userAvatar}>
             <Avatar src={user?.avatar}/><span>{user?.name}</span>
-          </Link>
+          </span>
         </Dropdown>
         <Button className={styles.rightBtn}>创作中心</Button>
       </div>
@@ -115,7 +126,7 @@ const RightHeader: React.FC = () => {
         onCancel={() => visit(null, true)}
         visible={true}
       >
-        <SignForm tab={tab}/>
+        <SignForm tab={tab} finish={() => visit(null, true)}/>
       </Modal>}
     </div>
   );

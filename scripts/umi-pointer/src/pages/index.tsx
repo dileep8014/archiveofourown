@@ -53,7 +53,7 @@ export default () => {
         onCancel={() => visit(true)}
         visible={true}
       >
-        <SignForm tab={'signUp'}/>
+        <SignForm tab={'signUp'} finish={() => visit(true)}/>
       </Modal>}
       <Col xxl={16} xl={16} lg={18} md={20} sm={24} xs={24}>
         {user && <Skeleton loading={loading}>

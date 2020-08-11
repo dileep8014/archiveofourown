@@ -88,22 +88,19 @@ request.interceptors.response.use((response, options) => {
 });
 
 const service = {
-  Test: function(): Promise<UserModelState> {
-    return new Promise(resolve => {
-      resolve({
-        id: 1,
-        name: 'shyptr',
-        email: 'xxx@qq.com',
-        avatar: 'https://assets.leetcode-cn.com/aliyun-lc-upload/users/yun-yan-7/avatar_1575262045.png',
-        root: true,
-      });
+  // Auth
+  Auth: function() {
+    return request('/auth');
+  },
+  // User
+  Update: async function(user: UserModelState) {
+    return request('/api/v1/users/update', {
+      method: 'post',
+      data: user,
     });
   },
   QueryCurrentUser: function() {
     return request('/api/v1/users/currentUser');
-  },
-  Auth: function() {
-    return request('/auth');
   },
   SignIn: function(account: string, password: string) {
     return request('/api/v1/users/login', {
@@ -122,14 +119,17 @@ const service = {
       data: { account: account, email: email, password: password },
     });
   },
+  // Topic
   HotsTopic: function() {
     return request('/api/v1/topic/hots');
   },
+  // Work
   SubWorks: async function(params: { current: number, pageSize: number }) {
     return request('/api/v1/works/subscribe', {
       params: params,
     });
   },
+  // News
   News: async function(params: { current: number, pageSize: number }) {
     return request('/api/v1/news', {
       params: params,

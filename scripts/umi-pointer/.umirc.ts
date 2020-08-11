@@ -35,7 +35,7 @@ export default defineConfig({
   },
   routes: [
     { exact: true, path: '/', component: '@/pages/index' },
-    { exact: true, path: '/userCenter', component: '@/pages/index' },
+    { exact: true, path: '/userCenter', component: '@/pages/userCenter/index',wrappers:['@/component/wrapper/auth']},
     {
       menu: { name: '同人圈' }, routes: [
         { path: '/category', menu: { name: '所有同人' } },

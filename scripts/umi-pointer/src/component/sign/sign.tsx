@@ -1,15 +1,14 @@
 import { Button, Checkbox, Form, Input, Tabs } from 'antd';
 import React from 'react';
 import { useModel } from '@@/plugin-model/useModel';
-import NProgress from 'nprogress';
-import 'nprogress/nprogress.css';
 import './sign.less';
 import { useRequest } from '@umijs/hooks';
 import service from '@/component/service';
 import Text from 'antd/es/typography/Text';
 import { Link } from 'umi';
+import ProgressOpt from '@/component/progress/progress';
 
-const LoginForm = () => {
+const LoginForm = (props: { finish: () => void }) => {
   const [form] = Form.useForm();
   const { signIn } = useModel('user', model => ({
     signIn: model.signin,
@@ -19,9 +18,8 @@ const LoginForm = () => {
     if (values.rememberme === undefined) {
       values.rememberme = false;
     }
-    NProgress.start();
-    signIn(values.username, values.password);
-    NProgress.done();
+    ProgressOpt(() => signIn(values.username, values.password));
+    props.finish();
   };
 
   return (
@@ -57,7 +55,7 @@ const LoginForm = () => {
   );
 };
 
-const RegisterForm = () => {
+const RegisterForm = (props: { finish: () => void }) => {
   const [form] = Form.useForm();
   const { run } = useRequest(
     ({ account, email, password }) => service.SignUp(account, email, password), {
@@ -66,6 +64,7 @@ const RegisterForm = () => {
 
   const onFinish = (values: any) => {
     run(values);
+    props.finish();
   };
 
 
@@ -96,20 +95,21 @@ const RegisterForm = () => {
 };
 
 interface SignProps {
-  tab: string
+  tab: string,
+  finish: () => void
 }
 
-const SignForm: React.FC<SignProps> = ({ tab }) => {
+const SignForm: React.FC<SignProps> = ({ tab, finish }) => {
 
   return (
     <div className='sign'>
       <h2 style={{ textAlign: 'center' }}>Pointer</h2>
       <Tabs centered defaultActiveKey={tab}>
         <Tabs.TabPane tab='登录' key='signIn'>
-          <LoginForm/>
+          <LoginForm finish={finish}/>
         </Tabs.TabPane>
         <Tabs.TabPane tab='注册' key='signUp'>
-          <RegisterForm/>
+          <RegisterForm finish={finish}/>
         </Tabs.TabPane>
       </Tabs>
 

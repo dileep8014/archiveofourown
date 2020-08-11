@@ -3,6 +3,7 @@ import service from './component/service';
 import React from 'react';
 import { useRequest } from '@umijs/hooks';
 
+
 export async function getInitialState() {
   let token = localStorage.getItem('x-auth-token');
   if (!token) {

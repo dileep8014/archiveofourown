@@ -7,6 +7,8 @@ let users = [{
   name: 'shyptr',
   email: 'xxx@qq.com',
   avatar: 'https://assets.leetcode-cn.com/aliyun-lc-upload/users/yun-yan-7/avatar_1575262045.png',
+  gender: 'man',
+  introduce: 'Pointer同人网创始人',
   root: true,
 }];
 
@@ -73,13 +75,17 @@ export default {
     res.send('');
   },
 
-  // 支持值为 Object 和 Array
+  // User
+  'POST /api/v1/users/update': (req: any, res: any) => {
+    if (currentUser) {
+      currentUser = req.body;
+    }
+    res.end('ok');
+  },
   'GET /api/v1/users/currentUser': (req: any, res: any) => {
     res.setHeader('x-auth-token', 'token-token-token');
     res.send(currentUser);
   },
-
-  // GET 可忽略
   '/api/v1/users/:id': (req: any, res: any) => {
     users.forEach(item => {
       if (item.id == req.match.id) {
@@ -87,7 +93,6 @@ export default {
       }
     });
   },
-
   'POST /api/v1/users/login': (req: any, res: any) => {
     users.forEach(item => {
       if (item.name == req.body.account || item.email == req.body.account) {
@@ -101,13 +106,14 @@ export default {
     currentUser = null;
     res.end('ok');
   },
-
   'POST /api/v1/users/create': (req: any, res: any) => {
     users.concat({
       id: users.length,
       name: req.account,
       email: req.email,
       avatar: 'https://assets.leetcode-cn.com/aliyun-lc-upload/users/yun-yan-7/avatar_1575262045.png',
+      gender: 'secret',
+      introduce: '',
       root: false,
     });
     res.end('ok');

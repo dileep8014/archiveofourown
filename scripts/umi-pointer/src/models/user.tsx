@@ -8,18 +8,26 @@ export type UserModelState = {
   name: string,
   email: string,
   avatar: string,
+  gender: string,
+  introduce: string,
   root: boolean,
 } | null
 
-export default function useCurrentUserModel(): { user: UserModelState, signin: (account: string, password: string) => void, signout: () => void } {
-  const [user, setUser] = useState(null);
+export default function useCurrentUserModel(): {
+  signin: (account: string, password: string) => void;
+  signout: () => void;
+  setUser: (value: UserModelState) => void;
+  user: UserModelState,
+  loading: boolean,
+} {
 
-  const { data, error, refresh } = useRequest(service.QueryCurrentUser);
+  const { data, error, refresh, loading } = useRequest(service.QueryCurrentUser);
+  const [user, update] = useState<UserModelState>(data);
   const { run: signIn } = useRequest(service.SignIn, {
     manual: true, onSuccess: res => {
       if (res == 'ok') {
         refresh().then(r => {
-          setUser(r);
+          update(r);
         });
       }
     },
@@ -27,19 +35,31 @@ export default function useCurrentUserModel(): { user: UserModelState, signin: (
   const { run: signOut } = useRequest(service.SignOut, {
     manual: true, onSuccess: res => {
       if (res == 'ok') {
-        setUser(null);
+        update(null);
+      }
+    },
+  });
+  const { run: updateUserInfo } = useRequest(service.Update, {
+    manual: true, onSuccess: (res, params) => {
+      if (res == 'ok') {
+        // @ts-ignore
+        update(params[0]);
       }
     },
   });
 
   useEffect(() => {
     if (data) {
-      setUser(data);
+      update(data);
     }
     if (error) {
       message.error(error);
     }
   }, [data, error]);
+
+  const setUser = useCallback((userInfo: UserModelState) => {
+    updateUserInfo(userInfo);
+  }, []);
 
   const signin = useCallback((account: string, password: string) => {
     // signin implementation
@@ -52,7 +72,9 @@ export default function useCurrentUserModel(): { user: UserModelState, signin: (
 
   return {
     user,
+    setUser,
     signin,
     signout,
+    loading,
   };
 }
