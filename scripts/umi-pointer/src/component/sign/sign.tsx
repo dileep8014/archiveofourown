@@ -31,7 +31,7 @@ const LoginForm = (props: { finish: () => void }) => {
           onFinish={onFinish}>
       <Form.Item name="username" rules={
         [{ required: true, message: '用户名不能为空' }]}>
-        <Input size={'large'} className="input-prepend restyle" placeholder="用户名 / 邮箱"/>
+        <Input defaultValue='shyptr' size={'large'} className="input-prepend restyle" placeholder="用户名 / 邮箱"/>
       </Form.Item>
       <Form.Item name="password" rules={
         [{ required: true, message: '密码不能为空' }]

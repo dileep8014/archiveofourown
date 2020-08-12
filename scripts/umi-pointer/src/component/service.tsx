@@ -1,6 +1,7 @@
 import { extend } from 'umi-request';
 import { notification } from 'antd';
 import { UserModelState } from '@/models/user';
+import { StyleState } from '@/pages/userCenter/userstyle';
 
 
 const codeMessage = {
@@ -93,6 +94,15 @@ const service = {
     return request('/auth');
   },
   // User
+  GetStyles: function() {
+    return request('/api/v1/users/styles');
+  },
+  UpdateStyles: function(styles: StyleState) {
+    return request('/api/v1/users/styles', {
+      method: 'post',
+      data: styles,
+    });
+  },
   Update: async function(user: UserModelState) {
     return request('/api/v1/users/update', {
       method: 'post',

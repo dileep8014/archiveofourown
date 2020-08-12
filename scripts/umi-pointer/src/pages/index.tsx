@@ -56,8 +56,8 @@ export default () => {
         <SignForm tab={'signUp'} finish={() => visit(true)}/>
       </Modal>}
       <Col xxl={16} xl={16} lg={18} md={20} sm={24} xs={24}>
-        {user && <Skeleton loading={loading}>
-          <ProList
+        <Skeleton loading={loading}>
+          {user && <ProList
             size='large'
             title={<div><span>最新订阅</span> <Divider type={'horizontal'}/></div>}
             split={false}
@@ -79,30 +79,29 @@ export default () => {
                 </div>),
               avatar: { src: item?.user?.avatar, size: 'large' },
             })}
-          />
-        </Skeleton>}
-        {!user && <div style={{ fontSize: 16 }}>
-          <span>Pointer旨在创建一个非营业的开放性的自由创作平台，目前Pointer还处于初步创建时期，我们更多的内容会聚焦在同人作品上。</span>
-          <Card bordered style={{ marginTop: 20 }}
-                bodyStyle={{ fontSize: 14 }}
-                actions={[<Button type={'primary'} onClick={() => visit(false)}>立即注册</Button>]}
-          >
-            <Card.Meta
-              description={<Text>
-                Pointer是非商业的一个项目。
+          />}
+          {!user && <div style={{ fontSize: 16 }}>
+            <span>Pointer旨在创建一个非营业的开放性的自由创作平台，目前Pointer还处于初步创建时期，我们更多的内容会聚焦在同人作品上。</span>
+            <Card bordered style={{ marginTop: 20 }}
+                  bodyStyle={{ fontSize: 14 }}
+                  actions={[<Button type={'primary'} onClick={() => visit(false)}>立即注册</Button>]}
+            >
+              <Card.Meta
+                description={<Text>
+                  Pointer是非商业的一个项目。
 
-                使用Pointer，您可以：
-                <ul>
-                  <li>分享自己的作品</li>
-                  <li>在您最喜欢的作品，专题或用户更新时得到通知</li>
-                  <li>参与线上创作活动</li>
-                  <li>获得更专业更精确的作品查询筛选服务</li>
-                </ul>
-                您可以通过邮箱自由创建属于自己的Pointer账户。欢迎所有志同道合的同伴！
-              </Text>}/>
-          </Card>
-        </div>
-        }
+                  使用Pointer，您可以：
+                  <ul>
+                    <li>分享自己的作品</li>
+                    <li>在您最喜欢的作品，专题或用户更新时得到通知</li>
+                    <li>参与线上创作活动</li>
+                    <li>获得更专业更精确的作品查询筛选服务</li>
+                  </ul>
+                  您可以通过邮箱自由创建属于自己的Pointer账户。欢迎所有志同道合的同伴！
+                </Text>}/>
+            </Card>
+          </div>}
+        </Skeleton>
       </Col>
       <Col xxl={8} xl={8} lg={6} md={4} sm={0} xs={0}>
         <Skeleton loading={false}>

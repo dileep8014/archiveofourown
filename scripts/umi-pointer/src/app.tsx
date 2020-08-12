@@ -2,6 +2,7 @@ import RightHeader from './component/rightHeader/rightHeader';
 import service from './component/service';
 import React from 'react';
 import { useRequest } from '@umijs/hooks';
+import { BackTop } from 'antd';
 
 
 export async function getInitialState() {
@@ -19,7 +20,7 @@ export const layout = {
     return <RightHeader/>;
   },
   footerRender: () => {
-    return <div/>
+    return <BackTop/>;
   },
 };
 

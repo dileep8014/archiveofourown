@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import service from '@/component/service';
 import { message } from 'antd';
 import { useRequest } from '@umijs/hooks';
+import moment from 'moment';
 
 export type UserModelState = {
   id: number,
@@ -9,6 +10,8 @@ export type UserModelState = {
   email: string,
   avatar: string,
   gender: string,
+  birthday: moment.Moment | null
+  phone: number | null,
   introduce: string,
   root: boolean,
 } | null
