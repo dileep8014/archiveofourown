@@ -1,5 +1,5 @@
 import React, { ReactText, useState } from 'react';
-import { useModel, history } from 'umi';
+import { useModel, history, Link } from 'umi';
 import { AutoComplete, Avatar, Button, Dropdown, Input, Menu, Modal } from 'antd';
 import styles from './rightHeader.less';
 import { SelectProps } from 'antd/es/select';
@@ -109,7 +109,7 @@ const RightHeader: React.FC = () => {
             <Avatar src={user?.avatar}/><span>{user?.name}</span>
           </span>
         </Dropdown>
-        <Button className={styles.rightBtn}>创作中心</Button>
+        <Link to='/creativeCenter' className={styles.rightBtn}>创作中心</Link>
       </div>
     );
   }

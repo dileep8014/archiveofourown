@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useRequest } from '@umijs/hooks';
 import service from '@/component/service';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
+import ProgressOpt from '@/component/progress/progress';
 
 export type StyleState = {
   email: boolean,
@@ -24,7 +25,7 @@ export default function UserStyle() {
   const { data, loading, refresh } = useRequest(service.GetStyles);
   const { run } = useRequest(service.UpdateStyles, {
     manual: true, onSuccess: () => {
-      refresh();
+      ProgressOpt(refresh);
       message.success('修改成功');
     },
   });

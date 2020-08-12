@@ -43,6 +43,21 @@ export default {
     'total': 5,
   }),
   // works
+  'GET /api/v1/works/mine': (req: any, res: any) => {
+    res.send(mockjs.mock({
+      'list|100': [{
+        'id|+1': 1,
+        title: '@ctitle',
+        cover: '@image(200x240)',
+        introduce: '@cparagraph',
+        comments: '@natural(0,10000)',
+        subscribe: '@natural(0,1000)',
+        college: '@natural(0,1000)',
+        hits: '@natural(0,100000)',
+      }],
+      total: 100,
+    }));
+  },
   'GET /api/v1/works/subscribe': (req: any, res: any) => {
     let data = {
       'id|+1': 1,

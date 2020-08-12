@@ -134,6 +134,11 @@ const service = {
     return request('/api/v1/topic/hots');
   },
   // Work
+  MineWorks: function(params: { current: number, pageSize: number }) {
+    return request('/api/v1/works/mine', {
+      params: params,
+    });
+  },
   SubWorks: async function(params: { current: number, pageSize: number }) {
     return request('/api/v1/works/subscribe', {
       params: params,
