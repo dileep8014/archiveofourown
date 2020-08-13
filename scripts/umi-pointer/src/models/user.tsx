@@ -14,6 +14,9 @@ export type UserModelState = {
   phone: number | null,
   introduce: string,
   root: boolean,
+  workDay: number,
+  words: number,
+  fans: number,
 } | null
 
 export default function useCurrentUserModel(): {

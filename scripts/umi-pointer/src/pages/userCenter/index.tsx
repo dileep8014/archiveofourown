@@ -8,7 +8,7 @@ export default () => {
 
 
   return (
-    <Tabs tabPosition='left'>
+    <Tabs tabPosition='left' style={{ paddingLeft: 100, paddingRight: 100 }}>
       <Tabs.TabPane tab='个人资料' key='1'>
         <UserInfo/>
       </Tabs.TabPane>

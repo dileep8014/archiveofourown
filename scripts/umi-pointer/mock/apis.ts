@@ -25,6 +25,9 @@ let users: UserModelState[] = [{
   phone: 13340210412,
   introduce: 'Pointer同人网创始人',
   root: true,
+  workDay: 10,
+  words: 10000,
+  fans: 100,
 }];
 
 let currentUser: UserModelState = users[0];
@@ -43,6 +46,12 @@ export default {
     'total': 5,
   }),
   // works
+  'GET /api/v1/works/calendar': mockjs.mock({
+    'list|12': [{
+      work: '@boolean',
+      'day|31': ['@boolean'],
+    }],
+  }),
   'GET /api/v1/works/mine': (req: any, res: any) => {
     res.send(mockjs.mock({
       'list|100': [{
@@ -50,6 +59,7 @@ export default {
         title: '@ctitle',
         cover: '@image(200x240)',
         introduce: '@cparagraph',
+        newChapter: '第@natural(1,1000)章 @ctitle',
         comments: '@natural(0,10000)',
         subscribe: '@natural(0,1000)',
         college: '@natural(0,1000)',
@@ -154,6 +164,9 @@ export default {
       introduce: '',
       phone: null,
       root: false,
+      words: 0,
+      workDay: 0,
+      fans: 0,
     });
     res.end('ok');
   },

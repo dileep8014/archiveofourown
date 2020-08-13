@@ -134,6 +134,9 @@ const service = {
     return request('/api/v1/topic/hots');
   },
   // Work
+  Calendar: function(params: { year: number}) {
+    return request('/api/v1/works/calendar', { data: params });
+  },
   MineWorks: function(params: { current: number, pageSize: number }) {
     return request('/api/v1/works/mine', {
       params: params,
