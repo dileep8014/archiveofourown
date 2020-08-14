@@ -109,6 +109,7 @@ const RightHeader: React.FC = () => {
             <Avatar src={user?.avatar}/><span>{user?.name}</span>
           </span>
         </Dropdown>
+        <Link to='/msgCenter' className={styles.rightBtn}>消息</Link>
         <Link to='/creativeCenter' className={styles.rightBtn}>创作中心</Link>
       </div>
     );

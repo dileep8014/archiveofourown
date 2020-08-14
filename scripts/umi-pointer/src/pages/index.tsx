@@ -11,6 +11,7 @@ import { Link } from 'umi';
 import moment from 'moment';
 import Text from 'antd/es/typography/Text';
 import SignForm from '@/component/sign/sign';
+import Paragraph from 'antd/es/typography/Paragraph';
 
 
 export default () => {
@@ -72,9 +73,12 @@ export default () => {
                   <Tag color={Random.color()} style={{ marginLeft: 8 }}>{item.topic}</Tag>
                 </Space>
               </span>),
+              description: (item.tags && <Paragraph ellipsis={{ rows: 1, expandable: true }}>
+                {item.tags.map((item: React.ReactNode) => (<Text style={{marginLeft:10}} underline>{item}</Text>))}
+              </Paragraph>),
               children: (
                 <div>
-                  <span>{item.newChapterDesc}</span>
+                  <Paragraph ellipsis={{ rows: 2, expandable: true }}>{item.newChapterDesc}</Paragraph>
                   <span style={{ float: 'right' }}>最新章节：{item.newChapter}</span>
                 </div>),
               avatar: { src: item?.user?.avatar, size: 'large' },

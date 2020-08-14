@@ -94,6 +94,9 @@ const service = {
     return request('/auth');
   },
   // User
+  UserCollege: function(params: { current: number, pageSize: number }) {
+    return request('/api/v1/users/college', { data: params });
+  },
   UserTopics: function(params: { current: number, pageSize: number | null }) {
     if (params.pageSize == null) {
       params.pageSize = 10;

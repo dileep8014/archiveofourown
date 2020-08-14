@@ -75,7 +75,7 @@ export default {
       title: '@ctitle',
       newChapterDesc: '@cparagraph',
       topic: '@ctitle',
-      'tags|3-12': '@last',
+      'tags|10-100': ['@last'],
       newChapter: '第@natural(1,1000)章 @ctitle',
       user: users[Random.natural(1, users.length) - 1],
     };
@@ -116,6 +116,15 @@ export default {
     res.send('');
   },
   // User
+  'GET /api/v1/users/college': mockjs.mock({
+    'list|100': [{
+      'id|+1': 1,
+      title: '@ctitle',
+      description: '@cparagraph',
+      worksNum: '@natural(1,1000)',
+    }],
+    total: 100,
+  }),
   'GET /api/v1/users/topics': mockjs.mock({
     'list|100': [{
       'id|+1': 1,

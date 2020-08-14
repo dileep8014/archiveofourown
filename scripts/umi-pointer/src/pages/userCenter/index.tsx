@@ -1,7 +1,8 @@
 import React from 'react';
-import {  Tabs} from 'antd';
+import { Tabs } from 'antd';
 import UserInfo from '@/pages/userCenter/userinfo';
 import UserStyle from '@/pages/userCenter/userstyle';
+import CollegeList from '@/pages/userCenter/college';
 
 
 export default () => {
@@ -16,7 +17,7 @@ export default () => {
         <UserStyle/>
       </Tabs.TabPane>
       <Tabs.TabPane tab='收藏夹' key='3'>
-
+        <CollegeList/>
       </Tabs.TabPane>
     </Tabs>
   );
