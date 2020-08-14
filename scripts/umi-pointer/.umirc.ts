@@ -1,6 +1,13 @@
 import { defineConfig } from 'umi';
 
 export default defineConfig({
+  locale: {
+    default: 'zh-CN',
+    antd: true,
+    title: true,
+    baseNavigator: true,
+    baseSeparator: '-',
+  },
   styles: ['./src/app.css'],
   layout: {
     'navTheme': 'light',

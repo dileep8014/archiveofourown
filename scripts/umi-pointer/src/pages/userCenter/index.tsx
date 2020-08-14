@@ -15,6 +15,9 @@ export default () => {
       <Tabs.TabPane tab='偏好设置' key='2'>
         <UserStyle/>
       </Tabs.TabPane>
+      <Tabs.TabPane tab='收藏夹' key='3'>
+
+      </Tabs.TabPane>
     </Tabs>
   );
 }

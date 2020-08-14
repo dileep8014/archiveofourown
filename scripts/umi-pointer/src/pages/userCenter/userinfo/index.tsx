@@ -9,7 +9,6 @@ import React, { useEffect, useState } from 'react';
 import { useModel } from '@@/plugin-model/useModel';
 import { UserModelState } from '@/models/user';
 import { LoadingOutlined, UploadOutlined } from '@ant-design/icons';
-import locale from 'antd/es/date-picker/locale/zh_CN';
 
 
 function getBase64(img: Blob, callback: { (imageUrl: any): void; (arg0: string | ArrayBuffer | null): any; }) {
@@ -137,7 +136,7 @@ export default function UserInfo() {
         </Descriptions.Item>
         <Descriptions.Item label="生日">
           <Field text={user?.birthday} value={userInfo?.birthday && moment(userInfo?.birthday)}
-                 valueType={'date'} mode={state} formItemProps={{ locale: locale }}
+                 valueType={'date'} mode={state}
                  onChange={(e) => setUserInfo(userInfo && { ...userInfo, birthday: e })}
           />
         </Descriptions.Item>

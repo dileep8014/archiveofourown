@@ -3,6 +3,7 @@ import { Tabs } from 'antd';
 import React from 'react';
 import MyWork from '@/pages/creativeCenter/work';
 import WorkBench from '@/pages/creativeCenter/workbench';
+import TopicList from '@/pages/creativeCenter/topic';
 
 export default () => {
   return (
@@ -13,14 +14,8 @@ export default () => {
       <Tabs.TabPane tab='作品' key='work'>
         <MyWork/>
       </Tabs.TabPane>
-      <Tabs.TabPane tab='草稿' key='draft'>
-
-      </Tabs.TabPane>
       <Tabs.TabPane tab='专题' key='topic'>
-
-      </Tabs.TabPane>
-      <Tabs.TabPane tab='收藏夹' key='college'>
-
+        <TopicList/>
       </Tabs.TabPane>
     </Tabs>);
 }

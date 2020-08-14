@@ -14,7 +14,7 @@ export interface WorkItemData {
 
 export default function WorkItem(props: WorkItemData) {
   return (
-    <Card bordered={false}>
+    <Card bordered={false} hoverable={false}>
       <Card.Meta title={props.title}
                  avatar={<img style={{ height: 120, width: 100 }} src={props.cover}/>}
                  description={<div>

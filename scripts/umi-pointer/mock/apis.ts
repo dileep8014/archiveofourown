@@ -34,6 +34,7 @@ let currentUser: UserModelState = users[0];
 
 
 export default {
+  // Topics
   // news
   'GET /api/v1/news': mockjs.mock({
     'list|4': [{
@@ -114,8 +115,22 @@ export default {
     res.setHeader('x-auth-token', 'token-token-token');
     res.send('');
   },
-
   // User
+  'GET /api/v1/users/topics': mockjs.mock({
+    'list|100': [{
+      'id|+1': 1,
+      title: '@ctitle',
+      category: function() {
+        let list = ['动漫', '文学', '影视', '戏剧', '音乐', '游戏', '其他'];
+        return list[Random.integer(0, 6)];
+      },
+      description: '@cparagraph',
+      original: '@ctitle',
+      url: '@url(http)',
+      worksNum: '@natural(1,1000)',
+    }],
+    total: 100,
+  }),
   'GET /api/v1/users/styles': (req: any, res: any) => {
     res.send(style);
   },

@@ -94,6 +94,12 @@ const service = {
     return request('/auth');
   },
   // User
+  UserTopics: function(params: { current: number, pageSize: number | null }) {
+    if (params.pageSize == null) {
+      params.pageSize = 10;
+    }
+    return request('/api/v1/users/topics', { data: params });
+  },
   GetStyles: function() {
     return request('/api/v1/users/styles');
   },
@@ -134,7 +140,7 @@ const service = {
     return request('/api/v1/topic/hots');
   },
   // Work
-  Calendar: function(params: { year: number}) {
+  Calendar: function(params: { year: number }) {
     return request('/api/v1/works/calendar', { data: params });
   },
   MineWorks: function(params: { current: number, pageSize: number }) {

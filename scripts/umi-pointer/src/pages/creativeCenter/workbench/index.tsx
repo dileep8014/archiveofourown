@@ -6,7 +6,6 @@ import Text from 'antd/es/typography/Text';
 import { useRequest } from '@umijs/hooks';
 import service from '@/component/service';
 import WorkItem from '@/pages/creativeCenter/workItem/workItem';
-import locale from 'antd/es/date-picker/locale/zh_CN';
 import moment from 'moment';
 
 
@@ -56,14 +55,17 @@ export default function WorkBench() {
           {data && data.list.length == 0 && <Button type={'primary'}>新建作品</Button>}
         </ProCard>
       </Skeleton>
-      <ProCard title='创作日历（红色为作品发布日）' style={{ marginTop: 20 }} headerBordered bordered>
+      <ProCard title='创作日历' style={{ marginTop: 20 }} headerBordered bordered>
 
-        <Calendar fullscreen={false} locale={locale}
+        <Calendar fullscreen={false}
                   dateFullCellRender={value => {
+                    const able = calendarData?.list[value.month()].day[value.date() - 1];
                     return (
-                      <Text type={calendarData?.list[value.month()].day[value.date() - 1] && 'danger'}>
-                        {value.date()}
-                      </Text>);
+                      <div style={{ backgroundColor: (able && '#ffddda') || '#fff' }}>
+                        <Text disabled={!able}>
+                          {value.date()}
+                        </Text>
+                      </div>);
                   }}
                   monthFullCellRender={value => {
                     return (
