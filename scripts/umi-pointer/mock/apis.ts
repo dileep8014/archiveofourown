@@ -34,7 +34,25 @@ let currentUser: UserModelState = users[0];
 
 
 export default {
+  // Tags
+  'GET /api/v1/tags': (req: any, res: any) => {
+    res.send(mockjs.mock({ 'list|0-10': [{ name: '@ctitle' }] }).list);
+  },
+  // Category
+  'GET /api/v1/category': (req: any, res: any) => {
+    if (req.query.type == 1) {
+      res.send([{ id: 1, name: '动漫' }, { id: 2, name: '文学' }, { id: 3, name: '影视' }, { id: 4, name: '戏剧' },
+        { id: 5, name: '音乐' }, { id: 6, name: '游戏' }, { id: 7, name: '其他' }]);
+      return;
+    }
+    res.send([{ id: 1, name: '玄幻' }, { id: 2, name: '仙侠' }, { id: 3, name: '言情' },
+      { id: 4, name: '武侠' }, { id: 5, name: '都市' },
+      { id: 6, name: '军事' }, { id: 7, name: '悬疑' }, { id: 8, name: '文学' }, { id: 9, name: '灵异' }]);
+  },
   // Topics
+  'GET /api/v1/topics': (req: any, res: any) => {
+    setTimeout(() => res.send(mockjs.mock({ 'list|10-20': [{ 'id|+1': 1, name: '@ctitle' }] }).list),1000);
+  },
   // news
   'GET /api/v1/news': mockjs.mock({
     'list|4': [{
@@ -47,6 +65,7 @@ export default {
     'total': 5,
   }),
   // works
+  'POST /api/v1/works': () => 'ok',
   'GET /api/v1/works/calendar': mockjs.mock({
     'list|12': [{
       work: '@boolean',
@@ -106,9 +125,6 @@ export default {
         break;
     }
   },
-
-  // tag
-  'GET /api/v1/topic/hots': mockjs.mock({ 'list|20-40': ['@ctitle'] }),
 
   //Auth
   'GET /auth': (req: any, res: any) => {

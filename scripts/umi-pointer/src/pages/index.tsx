@@ -5,9 +5,8 @@ import service from '@/component/service';
 import ErrorPage from '@/component/errorpage/errorpage';
 import { Button, Card, Col, Divider, Modal, Row, Skeleton, Space, Tag } from 'antd';
 import ProList from '@ant-design/pro-list';
-import { useModel } from '@@/plugin-model/useModel';
 import { Random } from 'mockjs';
-import { Link } from 'umi';
+import { Link, useModel } from 'umi';
 import moment from 'moment';
 import Text from 'antd/es/typography/Text';
 import SignForm from '@/component/sign/sign';
@@ -74,7 +73,7 @@ export default () => {
                 </Space>
               </span>),
               description: (item.tags && <Paragraph ellipsis={{ rows: 1, expandable: true }}>
-                {item.tags.map((item: React.ReactNode) => (<Text style={{marginLeft:10}} underline>{item}</Text>))}
+                {item.tags.map((item: React.ReactNode) => (<Tag style={{ marginLeft: 10 }}>{item}</Tag>))}
               </Paragraph>),
               children: (
                 <div>
@@ -124,7 +123,7 @@ export default () => {
               title: item.title,
               subTitle: (<span>发布时间: {moment().format('yyyy年M月D日')} 评论: {item.comments}</span>),
               children: (<div>
-                <span>{item.description}</span>
+                <Paragraph ellipsis={{ rows: 3, expandable: true }}>{item.description}</Paragraph>
                 <br/>
                 <Link style={{ float: 'right' }} to={'/news/' + item.id}><Text underline>阅读更多</Text></Link>
               </div>),

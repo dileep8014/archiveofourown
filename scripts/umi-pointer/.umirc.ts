@@ -67,8 +67,7 @@ export default defineConfig({
         { path: '/works', menu: { name: '作品' } },
         { path: '/topics', menu: { name: '专题' } },
         { path: '/tags', menu: { name: '标签' } },
-        { path: '/college', menu: { name: '收藏' } },
-        { path: '/college', menu: { name: '订阅' } },
+        { path: '/college', menu: { name: '书单' } },
       ],
     },
     {

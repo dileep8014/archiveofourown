@@ -89,6 +89,18 @@ request.interceptors.response.use((response, options) => {
 });
 
 const service = {
+  // Tags
+  SimilarTags: function(params: { similar: string }) {
+    return request('/api/v1/tags', { params: params });
+  },
+  // Topic
+  ListTopicByCategory: function(params: { categoryId: number }) {
+    return request('/api/v1/topics', { params: params });
+  },
+  // Category
+  Category: function(params: { type: number }) {
+    return request('/api/v1/category', { params: params });
+  },
   // Auth
   Auth: function() {
     return request('/auth');
@@ -138,11 +150,11 @@ const service = {
       data: { account: account, email: email, password: password },
     });
   },
-  // Topic
-  HotsTopic: function() {
-    return request('/api/v1/topic/hots');
-  },
   // Work
+  NewWork: function(params: { name: string, category: number, topic: number, tags: string[] | undefined, introduce: string }) {
+    console.log(params)
+    return request('/api/v1/works/new', { method: 'post', data: params });
+  },
   Calendar: function(params: { year: number }) {
     return request('/api/v1/works/calendar', { data: params });
   },

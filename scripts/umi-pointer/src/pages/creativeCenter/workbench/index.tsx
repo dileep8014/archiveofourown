@@ -1,6 +1,6 @@
 import React from 'react';
-import { Avatar, Button, Calendar, Card, List, Skeleton, Space } from 'antd';
-import { useModel } from '@@/plugin-model/useModel';
+import { Avatar, Button, Calendar, List, Skeleton, Space } from 'antd';
+import { useModel, history } from 'umi';
 import ProCard from '@ant-design/pro-card';
 import Text from 'antd/es/typography/Text';
 import { useRequest } from '@umijs/hooks';
@@ -9,7 +9,7 @@ import WorkItem from '@/pages/creativeCenter/workItem/workItem';
 import moment from 'moment';
 
 
-export default function WorkBench() {
+export default function WorkBench(props: { onCreate: () => void }) {
 
   const { user, userLoading } = useModel('user', model => ({ user: model.user, userLoading: model.loading }));
 
@@ -49,10 +49,12 @@ export default function WorkBench() {
       </ProCard>
       <Skeleton loading={loading}>
         <ProCard title='最近作品' style={{ marginTop: 20 }} headerBordered bordered loading={loading}
-                 extra={data && data.list?.length > 0 && <Button type={'primary'}>新建作品</Button>}
+                 extra={data && data.list?.length > 0 &&
+                 <Button onClick={props.onCreate} type={'primary'}>新建作品</Button>}
         >
           {data && data.list.length > 0 && <WorkItem {...data.list?.[0]}/>}
-          {data && data.list.length == 0 && <Button type={'primary'}>新建作品</Button>}
+          {data && data.list.length == 0 &&
+          <Button onClick={props.onCreate} type={'primary'}>新建作品</Button>}
         </ProCard>
       </Skeleton>
       <ProCard title='创作日历' style={{ marginTop: 20 }} headerBordered bordered>
@@ -68,10 +70,13 @@ export default function WorkBench() {
                       </div>);
                   }}
                   monthFullCellRender={value => {
+                    const able = calendarData?.list[value.month()].work;
                     return (
-                      <Text type={calendarData?.list[value.month()].work && 'danger'}>
-                        {value.date()}
-                      </Text>);
+                      <div style={{ backgroundColor: (able && '#ffddda') || '#fff' }}>
+                        <Text disabled={!able}>
+                          {value.date()}
+                        </Text>
+                      </div>);
                   }}
                   onChange={value => {
                     run({ year: value.year() });
