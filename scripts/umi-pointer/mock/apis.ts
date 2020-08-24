@@ -51,7 +51,7 @@ export default {
   },
   // Topics
   'GET /api/v1/topics': (req: any, res: any) => {
-    setTimeout(() => res.send(mockjs.mock({ 'list|10-20': [{ 'id|+1': 1, name: '@ctitle' }] }).list),1000);
+    setTimeout(() => res.send(mockjs.mock({ 'list|10-20': [{ 'id|+1': 1, name: '@ctitle' }] }).list), 1000);
   },
   // news
   'GET /api/v1/news': mockjs.mock({
@@ -65,6 +65,44 @@ export default {
     'total': 5,
   }),
   // works
+  'GET /api/v1/works': (req: any, res: any) => {
+    res.send(mockjs.mock({
+      id: req.query.id,
+      title: '@ctitle',
+      cover: '@image(200x240)',
+      lastChapter: {},
+      chapters: {
+        'draft|0-5': [{
+          'id|+1': 1,
+          title: '@ctitle',
+          words: '@natural(0,10000)',
+          updatedAt: '@date',
+        }],
+        published: {
+          subsectionNum: '@natural(1,3)',
+          chapterNum: '@natural(0,6)',
+          'subsection|1-3': [{
+            'id|+1': 1,
+            'seq|+1': 1,
+            name: '@ctitle',
+            introduce: '',
+            'chapters|0-2': [{
+              'id|+1': 1,
+              title: '@ctitle',
+              words: '@natural(0,10000)',
+              updatedAt: '@date',
+            }],
+          }],
+        },
+        'recycle|0-10': [{
+          'id|+1': 1,
+          title: '@ctitle',
+          words: '@natural(0,10000)',
+          updatedAt: '@date',
+        }],
+      },
+    }));
+  },
   'POST /api/v1/works': () => 'ok',
   'GET /api/v1/works/calendar': mockjs.mock({
     'list|12': [{

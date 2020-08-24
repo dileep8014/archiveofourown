@@ -151,8 +151,11 @@ const service = {
     });
   },
   // Work
+  WorkInfo: function(params: { id: number }) {
+    return request('/api/v1/works', { params: params });
+  },
   NewWork: function(params: { name: string, category: number, topic: number, tags: string[] | undefined, introduce: string }) {
-    console.log(params)
+    console.log(params);
     return request('/api/v1/works/new', { method: 'post', data: params });
   },
   Calendar: function(params: { year: number }) {

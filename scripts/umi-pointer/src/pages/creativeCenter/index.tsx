@@ -1,11 +1,9 @@
-import styles from './index.less';
 import { Tabs } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import MyWork from '@/pages/creativeCenter/work';
 import WorkBench from '@/pages/creativeCenter/workbench';
 import TopicList from '@/pages/creativeCenter/topic';
 import NewWork from '@/pages/creativeCenter/createWork';
-import { history } from 'umi';
 
 export default () => {
 

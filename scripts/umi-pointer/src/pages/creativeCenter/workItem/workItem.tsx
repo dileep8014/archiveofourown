@@ -1,5 +1,6 @@
 import { Button, Card, Col, Row } from 'antd';
 import React from 'react';
+import { history } from 'umi';
 
 export interface WorkItemData {
   id: number
@@ -31,7 +32,8 @@ export default function WorkItem(props: WorkItemData) {
                      </Col>
                      <Col span={4}>
                        <Button>作品设置</Button>
-                       <Button type={'primary'} style={{ marginLeft: 10 }}>新章节</Button>
+                       <Button onClick={() => window.open('/works/write/'+props.id)} type={'primary'}
+                               style={{ marginLeft: 10 }}>新章节</Button>
                      </Col>
                    </Row>
                  </div>}

@@ -14,7 +14,7 @@ export default function WorkBench(props: { onCreate: () => void }) {
   const { user, userLoading } = useModel('user', model => ({ user: model.user, userLoading: model.loading }));
 
   const { data, loading } = useRequest(service.MineWorks, { defaultParams: [{ current: 1, pageSize: 1 }] });
-  const { data: calendarData, loading: calendarLoading, run } = useRequest(service.Calendar, {
+  const { data: calendarData, run } = useRequest(service.Calendar, {
     defaultParams: [{
       year: moment(moment.now()).year(),
     }],

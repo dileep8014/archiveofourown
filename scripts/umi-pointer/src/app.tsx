@@ -3,6 +3,7 @@ import service from './component/service';
 import React from 'react';
 import { useRequest } from '@umijs/hooks';
 import { BackTop } from 'antd';
+import ErrorPage from '@/component/errorpage/errorpage';
 
 
 export async function getInitialState() {
@@ -22,6 +23,7 @@ export const layout = {
   footerRender: () => {
     return <BackTop/>;
   },
+  onError: (error: Error, info: any) => <ErrorPage title={error.name} subTitle={error.message}/>,
 };
 
 

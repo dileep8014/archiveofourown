@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Anchor, Button, Card, Col, Row, Skeleton, Tooltip } from 'antd';
+import { Button, Card, Skeleton } from 'antd';
 import { useModel, history } from 'umi';
 import { useRequest } from '@umijs/hooks';
 import service from '@/component/service';

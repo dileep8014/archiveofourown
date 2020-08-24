@@ -4,7 +4,6 @@ export default defineConfig({
   locale: {
     default: 'zh-CN',
     antd: true,
-    title: true,
     baseNavigator: true,
     baseSeparator: '-',
   },
@@ -12,9 +11,8 @@ export default defineConfig({
   layout: {
     'navTheme': 'light',
     'layout': 'top',
-    'contentWidth': 'Fixed',
-    'fixedHeader': true,
-    'fixSiderbar': true,
+    'fixedHeader': false,
+    'fixSiderbar': false,
     'menu': {
       'locale': true,
     },
@@ -42,11 +40,26 @@ export default defineConfig({
   },
   routes: [
     { exact: true, path: '/', component: '@/pages/index' },
-    { exact: true, path: '/userCenter', component: '@/pages/userCenter/index', wrappers: ['@/component/wrapper/auth'] },
+    {
+      exact: true,
+      path: '/userCenter',
+      title: '个人中心',
+      component: '@/pages/userCenter/index',
+      wrappers: ['@/component/wrapper/auth'],
+    },
     {
       exact: true,
       path: '/creativeCenter',
+      title: '创作中心',
       component: '@/pages/creativeCenter/index',
+      wrappers: ['@/component/wrapper/auth'],
+    },
+    {
+      exact: false,
+      path: '/works/write',
+      title: '写作',
+      component: '@/pages/work/write/index',
+      layout: { hideNav: true, hideMenu: true },
       wrappers: ['@/component/wrapper/auth'],
     },
     {
