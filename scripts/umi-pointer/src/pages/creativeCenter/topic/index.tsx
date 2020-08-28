@@ -3,17 +3,17 @@ import Field from '@ant-design/pro-field';
 import React from 'react';
 import { useModel } from 'umi';
 import { useRequest } from '@umijs/hooks';
-import service from '@/component/service';
 import { Button, Descriptions, List, Skeleton, Space } from 'antd';
 import DescriptionsItem from 'antd/es/descriptions/Item';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Text from 'antd/es/typography/Text';
+import { userService } from '@/service/user';
 
 export default function TopicList() {
 
   const { user, userLoading } = useModel('user', model => ({ user: model.user, userLoading: model.loading }));
 
-  const { data, loading, pagination } = useRequest(service.UserTopics, { paginated: true });
+  const { data, loading, pagination } = useRequest(userService.UserTopics, { paginated: true });
 
   return (
     <Skeleton loading={userLoading && loading}>

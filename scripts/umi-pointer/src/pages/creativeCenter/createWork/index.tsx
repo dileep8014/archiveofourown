@@ -15,19 +15,22 @@ import {
 import React, { useState } from 'react';
 import { Link, history } from 'umi';
 import { useRequest } from '@umijs/hooks';
-import service from '@/component/service';
 import { Option } from 'antd/es/mentions';
 import Text from 'antd/es/typography/Text';
 import ProgressOpt from '@/component/progress/progress';
+import { categoryService } from '@/service/category';
+import { topicService } from '@/service/topic';
+import { tagService } from '@/service/tag';
+import { workService } from '@/service/work';
 
 const { Step } = Steps;
 
 export default function NewWork(props: { cancel: () => void }) {
 
-  const { data: category, run: fetchCategory, loading: categoryLoad } = useRequest(service.Category, { manual: true });
-  const { data: topics, run: fetchTopics, loading: topicsLoad } = useRequest(service.ListTopicByCategory, { manual: true });
-  const { data: tags, run: fetchTags, loading: tagsLoad } = useRequest(service.SimilarTags, { manual: true });
-  const { run } = useRequest(service.NewWork, { manual: true, onSuccess: () => next() });
+  const { data: category, run: fetchCategory, loading: categoryLoad } = useRequest(categoryService.Category, { manual: true });
+  const { data: topics, run: fetchTopics, loading: topicsLoad } = useRequest(topicService.ListTopicByCategory, { manual: true });
+  const { data: tags, run: fetchTags, loading: tagsLoad } = useRequest(tagService.SimilarTags, { manual: true });
+  const { run } = useRequest(workService.NewWork, { manual: true, onSuccess: () => next() });
 
 
   const [current, setCurrent] = useState(0);

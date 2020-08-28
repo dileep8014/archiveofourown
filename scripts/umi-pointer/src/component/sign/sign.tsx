@@ -3,10 +3,10 @@ import React from 'react';
 import { useModel } from '@@/plugin-model/useModel';
 import './sign.less';
 import { useRequest } from '@umijs/hooks';
-import service from '@/component/service';
 import Text from 'antd/es/typography/Text';
 import { Link } from 'umi';
 import ProgressOpt from '@/component/progress/progress';
+import { userService } from '@/service/user';
 
 const LoginForm = (props: { finish: () => void }) => {
   const [form] = Form.useForm();
@@ -58,7 +58,7 @@ const LoginForm = (props: { finish: () => void }) => {
 const RegisterForm = (props: { finish: () => void }) => {
   const [form] = Form.useForm();
   const { run } = useRequest(
-    ({ account, email, password }) => service.SignUp(account, email, password), {
+    ({ account, email, password }) => userService.SignUp(account, email, password), {
       manual: true,
     });
 

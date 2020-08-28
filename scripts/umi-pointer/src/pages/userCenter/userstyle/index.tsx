@@ -1,9 +1,9 @@
 import { Button, Card, Checkbox, List, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useRequest } from '@umijs/hooks';
-import service from '@/component/service';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import ProgressOpt from '@/component/progress/progress';
+import { userService } from '@/service/user';
 
 export type StyleState = {
   email: boolean,
@@ -22,8 +22,8 @@ export type StyleState = {
 export default function UserStyle() {
 
   const [styles, setStyles] = useState<StyleState>(null);
-  const { data, loading, refresh } = useRequest(service.GetStyles);
-  const { run } = useRequest(service.UpdateStyles, {
+  const { data, loading, refresh } = useRequest(userService.GetStyles);
+  const { run } = useRequest(userService.UpdateStyles, {
     manual: true, onSuccess: () => {
       ProgressOpt(refresh);
       message.success('修改成功');

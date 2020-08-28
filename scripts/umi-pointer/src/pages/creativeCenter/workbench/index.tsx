@@ -4,17 +4,17 @@ import { useModel, history } from 'umi';
 import ProCard from '@ant-design/pro-card';
 import Text from 'antd/es/typography/Text';
 import { useRequest } from '@umijs/hooks';
-import service from '@/component/service';
 import WorkItem from '@/pages/creativeCenter/workItem/workItem';
 import moment from 'moment';
+import { workService } from '@/service/work';
 
 
 export default function WorkBench(props: { onCreate: () => void }) {
 
   const { user, userLoading } = useModel('user', model => ({ user: model.user, userLoading: model.loading }));
 
-  const { data, loading } = useRequest(service.MineWorks, { defaultParams: [{ current: 1, pageSize: 1 }] });
-  const { data: calendarData, run } = useRequest(service.Calendar, {
+  const { data, loading } = useRequest(workService.MineWorks, { defaultParams: [{ current: 1, pageSize: 1 }] });
+  const { data: calendarData, run } = useRequest(workService.Calendar, {
     defaultParams: [{
       year: moment(moment.now()).year(),
     }],

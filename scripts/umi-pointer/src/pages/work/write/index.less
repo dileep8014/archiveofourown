@@ -6,8 +6,23 @@
   width: 100%;
 }
 
+.writeIcon {
+  padding-right: 5px;
+  font-size: 14px;
+}
+
+.smallText {
+  font-size: 12px;
+  line-height: 20px;
+  color: #bfbfbf;
+  margin: 0 4px;
+}
+
 .writeSider {
   border-right: 1px solid #e0e0e0;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   .writeSpace {
     height: 48px;
@@ -19,50 +34,6 @@
       height: 30px;
       margin-left: 20px;
     }
-  }
-
-  .writeMenu {
-    font-size: 14px;
-
-    .writeMenuItem {
-      margin-top: 12px;
-      height: fit-content;
-      width: 100%;
-    }
-
-    .smallText {
-      font-size: 12px;
-      line-height: 20px;
-      color: #bfbfbf;
-      margin: 0 4px;
-    }
-
-    .writeIcon {
-      font-size: 14px;
-    }
-  }
-}
-
-.writeModalMenu {
-  font-size: 14px;
-  border-bottom: 1px solid #e0e0e0;
-  height: 300px;
-
-  .writeModalMenuItem {
-    margin-top: 12px;
-    height: fit-content;
-    width: 100%;
-  }
-
-  .smallText {
-    font-size: 12px;
-    line-height: 20px;
-    color: #bfbfbf;
-    margin: 0 4px;
-  }
-
-  .writeIcon {
-    font-size: 14px;
   }
 }
 
@@ -80,34 +51,6 @@
   align-items: center;
   display: block;
 
-  .chapterBody {
-    padding-top: 0;
-    //height: calc(100vh - 134px);
-    background-color: #fff;
-    max-width: 768px;
-    margin: 12px auto 0;
-    position: relative;
-
-    .scrollDiv {
-      padding: 30px;
-      font-size: 16px;
-      line-height: 32px;
-      color: #292929;
-      position: relative;
-      box-shadow: 0 0 4px rgba(0, 0, 0, .16);
-      height: calc(100vh - 100px);
-
-      .writeArea {
-        font-size: 14px;
-        background-color: inherit;
-        position: relative;
-        padding: 20px 0 0;
-        height: calc(100% - 100px);
-        overflow:auto;
-      }
-    }
-  }
-
 }
 
 .writeRowCol {
@@ -118,4 +61,17 @@
   color: rgba(10, 10, 10, 0.62);
   width: 80px;
   font-size: 13px;
+}
+
+.writeOpGroup {
+  width: 100%;
+  text-align: center;
+  background-color: white;
+  border-bottom: 1px solid #e0e0e0;
+
+  .opBtn {
+    margin-left: 20px;
+    border: 0;
+    box-shadow: none;
+  }
 }

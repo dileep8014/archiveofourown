@@ -1,26 +1,16 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Node, createEditor } from 'slate';
-import { Slate, Editable, withReact } from 'slate-react';
-import { withHistory } from 'slate-history';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Button,
-  Card,
-  Col,
+  Col, Collapse,
   Divider,
-  Dropdown, Form, Input,
+  Dropdown,
   Layout,
-  Menu,
-  Modal,
+  Menu, message,
   Row,
-  Skeleton,
-  Space,
+  Space, Spin,
   Tooltip,
   Typography,
 } from 'antd';
-import { history } from 'umi';
-import ErrorPage from '@/component/errorpage/errorpage';
-import { useRequest } from '@umijs/hooks';
-import service from '@/component/service';
 import styles from './index.less';
 import {
   MenuFoldOutlined,
@@ -30,94 +20,220 @@ import {
   FileAddOutlined,
   SendOutlined,
   RestOutlined,
+  InboxOutlined,
+  RollbackOutlined,
+  ArrowRightOutlined,
+  HistoryOutlined,
 } from '@ant-design/icons';
 import IconFont from '@/component/iconfont/iconfont';
-import moment from 'moment';
+import numberParseChina from '@/component/numconvert/numconvert';
+import SubsectionManager from '@/pages/work/write/subsectionManager';
+import Editor from '@/pages/work/write/editor';
+import { ChapterItem, SubsectionItem } from '@/pages/work/write/sider/menuItem';
+import DraftMenu from '@/pages/work/write/sider/draft';
+import { useDispatch, useSelector } from '@@/plugin-dva/exports';
+import SubsectionMenu from '@/pages/work/write/sider/subsection';
+import RecycleMenu from '@/pages/work/write/sider/recycle';
+import ErrorPage from '@/component/errorpage/errorpage';
+import { createEditor, Node } from 'slate';
+import { useInterval, useMount, useUnmount } from 'ahooks';
+import { Prompt } from 'react-router-dom';
+import { withHistory } from 'slate-history';
+import { withReact } from 'slate-react';
 
 const { Header, Content, Sider } = Layout;
 const { Text } = Typography;
 
-const initialValue = [
-  {
-    children: [
-      { text: '' },
-    ],
-  },
-];
-
-interface ChapterItem {
-  words: number;
-  id: number;
-  updatedAt: any;
-  title: string;
+export interface WriteState {
+  title: string,
+  value: Node[]
 }
 
-interface SubItem {
-  id: number;
-  seq: number,
-  name: string,
-  introduce: string,
-  chapters: ChapterItem[],
-}
-
-const ChapterMenuItem = (item: { words: number; updatedAt: any; title: string }) =>
-  <Card size={'small'} bordered={false} style={{ backgroundColor: 'inherit' }}>
-    <Card.Meta title={<Text style={{ fontWeight: 8, fontSize: 13 }}>{item.title}</Text>}
-               description={<Text className={styles.smallText}>
-                 {item.updatedAt && (moment(item.updatedAt).format('M-D H:M:S') + '  ')}
-                 {item.words}字
-               </Text>}
-    />
-  </Card>;
+export const initValue = [{ children: [{ text: '输入正文...' }] }];
 
 export default function() {
   document.title = '写作';
 
-  const pathname = history.location.pathname.split('/');
-  const workId = pathname.length == 4 ? pathname[3] : undefined;
+  const dispatch = useDispatch();
+  const { data, subsection, error, saveLoading, draft } = useSelector((state: any) => {
+    return {
+      data: state.work.data,
+      draft: state.work.draft,
+      subsection: state.work.subsection,
+      error: state.work.error,
+      saveLoading: state.loading.effects['work/save'],
+    };
+  });
 
-  const { data, loading, error, run, refresh } = useRequest(service.WorkInfo, { manual: true });
+  const editor = useMemo(() => withHistory(withReact(createEditor())), []);
 
+  const [draftChapter, setDraftChapter] = useState<ChapterItem>({
+    words: 0,
+    id: -1,
+    updatedAt: null,
+    title: '',
+    type: 'draft',
+    subsection: 1,
+  });
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const [subManage, setSubManage] = useState<boolean>(false);
-  const [subSeq, setSubSeq] = useState<SubItem | null>(null);
-  const [currentSub, setCurrentSub] = useState<SubItem | null>(null);
-  const [draftChapter, setDraftChapter] = useState<{ hide: boolean, words: number }>({ hide: true, words: 0 });
-  const [value, setValue] = useState<Node[]>(initialValue);
-  const [title, setTitle] = useState<Node[]>(initialValue);
-  const editor = useMemo(() => withHistory(withReact(createEditor())), []);
-  const titleEditor = useMemo(() => withHistory(withReact(createEditor())), []);
-  const [form] = Form.useForm();
+  const [canUpdate, setCanUpdate] = useState<boolean>(false);
+  const [newDraft, setNewDraft] = useState<boolean>(false);
+  const [write, setWrite] = useState<WriteState>({ title: '', value: initValue });
 
-  useEffect(() => {
-    if (workId) {
-      run({ id: workId });
-    }
-  }, [workId]);
+  const [currentChapter, setCurrentChapter] = useState<ChapterItem | null>(null);
+
+  const listener = (e: { preventDefault: () => void; returnValue: string; }) => {
+    e.preventDefault();
+    e.returnValue = '离开当前页后，所编辑的数据将不可恢复';
+    // localStorage.removeItem('draft');
+  };
 
   useEffect(() => {
     if (data) {
-      if ((!data.chapters.draft || data.chapters.draft.length == 0) && draftChapter.hide) {
-        setDraftChapter({ hide: false, words: 0 });
+      if (data.draft == 0) {
+        setNewDraft(true);
+        if (!currentChapter) {
+          setCurrentChapter(draftChapter);
+        }
+      } else if (!currentChapter) {
+        setCurrentChapter(draft[draft.length - 1]);
       }
-      setSubSeq(data.chapters.published.subsection[data.chapters.published.subsection.length - 1]);
-      setCurrentSub(data.chapters.published.subsection[data.chapters.published.subsection.length - 1]);
     }
-  }, [data]);
+  }, [data, draft]);
 
-  if (workId == undefined) {
-    return <ErrorPage title='错误的作品' subTitle='您要编辑的作品不存在'/>;
-  }
+  useEffect(() => {
+    if (subsection.length > 0) {
+      setDraftChapter({ ...draftChapter, subsection: subsection[subsection.length - 1].seq });
+    }
+  }, [subsection]);
+
+  useInterval(() => {
+    if (write.title == '' || write.value == initValue || nodesConvert(write.value) == '') {
+      return;
+    }
+    save();
+    if (currentChapter?.id == -1) {
+      setNewDraft(false);
+      setCurrentChapter(null);
+    }
+  }, 30000);
+
+  useMount(() => window.addEventListener('beforeunload', listener));
+
+  useUnmount(() => {
+    window.removeEventListener('beforeunload', listener);
+    localStorage.removeItem('draft');
+  });
+
+  const save = () => {
+    if (currentChapter?.type != 'draft' && !canUpdate) {
+      return;
+    }
+    dispatch({
+      type: 'work/save', payload: {
+        id: currentChapter?.id,
+        title: write.title,
+        type: currentChapter?.type,
+        subsection: currentChapter?.subsection,
+        content: nodesConvert(write.value),
+      },
+    });
+  };
+
+  const onNewChapter = () => {
+    if (newDraft) {
+      if (data.draft > 0 && currentChapter?.id != -1) {
+        setCurrentChapter(draftChapter);
+        return;
+      }
+      if (write.title == '' || write.value == initValue || nodesConvert(write.value) == '') {
+        message.error('请先完成当前草稿');
+        return;
+      }
+      save();
+      setWrite({ title: '', value: initValue });
+    } else {
+      setNewDraft(true);
+      setCurrentChapter(draftChapter);
+    }
+  };
+
+  const onChangeItem = (item: ChapterItem) => {
+    if (currentChapter?.id != item.id) {
+      setCurrentChapter(item);
+      if (write.title == '' || write.value == initValue || nodesConvert(write.value) == '') {
+        if (currentChapter?.id == -1) {
+          localStorage.setItem('draft', JSON.stringify(write));
+        }
+        return;
+      }
+      save();
+      if (currentChapter?.id == -1) {
+        setNewDraft(false);
+      }
+    }
+  };
+
+  const onSave = () => {
+    if (write.title == '' || write.value == initValue || nodesConvert(write.value) == '') {
+      if (currentChapter?.id == -1) {
+        message.error('请先完成当前草稿');
+      } else {
+        message.error('请先完成当前章节');
+      }
+      return;
+    }
+    save();
+    if (currentChapter?.id == -1) {
+      setNewDraft(false);
+      setCurrentChapter(null);
+    }
+  };
+
+  const onDelete = () => {
+    if (currentChapter?.id == -1) {
+      localStorage.removeItem('draft');
+      if (data.draft == 0) {
+        setCurrentChapter(draftChapter);
+        return;
+      }
+      setNewDraft(false);
+      setCurrentChapter(draft[draft.length - 1]);
+      return;
+    }
+    dispatch({
+      type: 'work/delete',
+      payload: { id: currentChapter?.id, type: currentChapter?.type, subsection: currentChapter?.subsection },
+    });
+  };
+
+  const onPublish = () => {
+    if (currentChapter?.id == -1) {
+      message.warning('请先保存当前草稿');
+      return;
+    }
+    dispatch({
+      type: 'work/publish',
+      payload: { id: currentChapter?.id, type: currentChapter?.type, subsection: currentChapter?.subsection },
+    });
+    setCurrentChapter(null);
+  };
 
   if (error) {
     return <ErrorPage title={error.name} subTitle={error.message}/>;
   }
 
   return (
-    <Skeleton loading={loading}>
+    <div>
+      <Prompt
+        when={true}
+        message={() => '离开当前页后，所编辑的数据将不可恢复'}
+      />
       {data &&
       <Layout className={styles.writeLayout}>
         <Sider theme={'light'}
+               width={264}
                className={styles.writeSider}
                collapsed={collapsed}
                collapsedWidth={0}
@@ -131,125 +247,34 @@ export default function() {
                       style={{ border: 0, boxShadow: 'none' }}
                       icon={<IconFont type='icon-anjuanguanli'/>}/>
             </Tooltip>
-            <Modal visible={subManage}
-                   title='分卷管理'
-                   footer={null}
-                   centered
-                   bodyStyle={{ height: 400 }}
-                   onCancel={() => setSubManage(false)}>
-              <Space style={{ width: '100%', height: '100%' }}>
-                <div style={{ display: 'grid' }}>
-                  <Menu className={styles.writeModalMenu}
-                        selectedKeys={[subSeq?.id + '']}
-                        onSelect={({ key }) => {
-                          data.chapters.published.subsection.forEach((item: SubItem) => {
-                            if (item.id == parseInt(key.toString())) {
-                              setSubSeq(item);
-                            }
-                          });
-                        }}
-                        mode='inline'>
-                    {data.chapters.published.subsection.map((item: SubItem) =>
-                      <Menu.Item className={styles.writeModalMenuItem} key={item.id} mode='vertical-left'>
-                        <Card size={'small'} bordered={false} style={{ backgroundColor: 'inherit' }}>
-                          <Card.Meta title={<Text style={{ fontWeight: 8, fontSize: 13 }}>第{item.seq}卷</Text>}
-                                     description={<Text className={styles.smallText}>本卷共{item.chapters.length}章</Text>}
-                          />
-                        </Card>
-                      </Menu.Item>)
-                    }
-                  </Menu>
-                  <Button style={{ border: 0, boxShadow: 'none', color: '#0067E6', marginTop: 20 }}
-                          icon={<FileAddOutlined/>}>
-                    新建分卷
-                  </Button>
-                </div>
-                <Card bordered={false} style={{ height: 300, width: 350 }}>
-                  <Card.Meta title={'第' + subSeq?.seq + '卷'}
-                             description={<Form form={form}>
-                               <Form.Item label='分卷名称'>
-                                 <Input value={subSeq?.name} placeholder='非必填' onChangeCapture={event => {
-                                   setSubSeq(subSeq && { ...subSeq, name: event.currentTarget.value });
-                                 }}/>
-                               </Form.Item>
-                               <Form.Item label='分卷简介'>
-                                 <Input.TextArea value={subSeq?.introduce}
-                                                 autoSize={{ maxRows: 6, minRows: 6 }}
-                                                 placeholder='非必填'
-                                                 onChangeCapture={event => {
-                                                   setSubSeq(subSeq && {
-                                                     ...subSeq,
-                                                     introduce: event.currentTarget.value,
-                                                   });
-                                                 }}
-                                 />
-                               </Form.Item>
-                               <Form.Item style={{ float: 'right' }}>
-                                 <Button style={{ marginRight: 10 }}>删除分卷</Button>
-                                 <Button type={'primary'}>保存</Button>
-                               </Form.Item>
-                             </Form>}
-                  />
-                </Card>
-              </Space>
-            </Modal>
+            <SubsectionManager subManage={subManage} setSubManage={setSubManage}/>
           </Space>
-          <Menu className={styles.writeMenu} mode='inline'>
-            <Menu.Item className={styles.writeMenuItem} key='newChapter'>
-              <FileAddOutlined className={styles.writeIcon}/>新建章节
-            </Menu.Item>
-            <Menu.SubMenu className={styles.writeMenuItem}
-                          key='draft'
-                          icon={<IconFont type='icon-caogaoxiang' className={styles.writeIcon}/>}
-                          title={<>草稿箱
-                            <Text className={styles.smallText}>
-                              (共{(data.chapters.draft && data.chapters.draft.length) || 0}章)
-                            </Text></>}
+          <Button style={{ border: 0, boxShadow: 'none', width: '100%', height: 40, textAlign: 'left' }}
+                  icon={<FileAddOutlined className={styles.writeIcon}/>}
+                  onClick={onNewChapter}
+          >
+            新建章节
+          </Button>
+          <Collapse defaultActiveKey={[currentChapter?.type || 'draft']}
+                    expandIconPosition={'right'} bordered={false} ghost>
+            <Collapse.Panel key='draft'
+                            header={<><InboxOutlined className={styles.writeIcon}/>草稿箱
+                              <Text className={styles.smallText}>(共{data.draft}章)</Text></>}
             >
-              {!draftChapter.hide &&
-              <Menu.Item className={styles.writeMenuItem} key='draftChapter' mode='vertical-left'>
-                <ChapterMenuItem words={draftChapter.words} updatedAt={null} title={'未命名'}/>
-              </Menu.Item>}
-              {data.chapters.draft && data.chapters.draft.length > 0 &&
-              data.chapters.draft.map((item: ChapterItem) =>
-                <Menu.Item className={styles.writeMenuItem} key={item.id} mode='vertical-left'>
-                  <ChapterMenuItem words={item.words} updatedAt={item.updatedAt} title={item.title}/>
-                </Menu.Item>)
-              }
-            </Menu.SubMenu>
-            <Menu.SubMenu className={styles.writeMenuItem}
-                          key='publish'
-                          icon={<SendOutlined className={styles.writeIcon}/>}
-                          title={<>已发布
-                            <Text className={styles.smallText}>
-                              共{data.chapters.published.subsectionNum}卷 {data.chapters.published.chapterNum}章
-                            </Text></>}
-            >
-              {data.chapters.published.subsection.map((item: SubItem) =>
-                <Menu.SubMenu key={item.id} title={<Text>第{item.seq}卷 {item.name}</Text>}>
-                  {item.chapters && item.chapters.map((subItem: ChapterItem) =>
-                    <Menu.Item className={styles.writeMenuItem} key={subItem.id} mode='vertical-left'>
-                      <ChapterMenuItem words={subItem.words} updatedAt={subItem.updatedAt} title={subItem.title}/>
-                    </Menu.Item>,
-                  )}
-                </Menu.SubMenu>)
-              }
-            </Menu.SubMenu>
-            <Menu.SubMenu className={styles.writeMenuItem}
-                          key='recycle'
-                          icon={<RestOutlined className={styles.writeIcon}/>}
-                          title={<>回收站
-                            <Text className={styles.smallText}>
-                              (共{(data.chapters.recycle && data.chapters.recycle.length) || 0}章)
-                            </Text></>}
-            >
-              {data.chapters.recycle && data.chapters.recycle.map((item: ChapterItem) =>
-                <Menu.Item className={styles.writeMenuItem} key={item.id} mode='vertical-left'>
-                  <ChapterMenuItem words={item.words} updatedAt={item.updatedAt} title={item.title}/>
-                </Menu.Item>)
-              }
-            </Menu.SubMenu>
-          </Menu>
+              <DraftMenu draftChapter={draftChapter} currentItem={currentChapter}
+                         newDraft={newDraft} setCurrentItem={onChangeItem}/>
+            </Collapse.Panel>
+            <Collapse.Panel key='published'
+                            header={<><SendOutlined className={styles.writeIcon}/>已发布
+                              <Text className={styles.smallText}>(共{data.subsection}卷 {data.chapters}章)</Text></>}>
+              <SubsectionMenu currentItem={currentChapter} setCurrentItem={onChangeItem}/>
+            </Collapse.Panel>
+            <Collapse.Panel key='recycle'
+                            header={<><RestOutlined className={styles.writeIcon}/>回收站
+                              <Text className={styles.smallText}>(共{data.recycle}章)</Text></>}>
+              <RecycleMenu/>
+            </Collapse.Panel>
+          </Collapse>
         </Sider>
         <Layout>
           <Header className={styles.writeHeader}>
@@ -264,14 +289,17 @@ export default function() {
                             onClick={() => setCollapsed(!collapsed)}
                     />
                   </Tooltip>
-                  <Dropdown trigger={['click']}
+                  <Dropdown trigger={['click']} disabled={currentChapter?.type == 'published'}
                             overlay={<Menu>
-                              {data.chapters.published.subsection.map((item: SubItem) =>
-                                <Menu.Item key={item.id} onClick={() => setCurrentSub(item)}>第{item.seq}卷</Menu.Item>)}
-                              <Menu.Item key='new'>新建分卷</Menu.Item>
+                              {subsection.map((item: SubsectionItem) =>
+                                <Menu.Item onClick={() => setCurrentChapter(currentChapter && {
+                                  ...currentChapter,
+                                  subsection: item.seq,
+                                })}
+                                           key={item.id}>第{numberParseChina(item.seq)}卷</Menu.Item>)}
                             </Menu>}>
                     <Button style={{ border: 0, boxShadow: 'none' }}>
-                      第{currentSub?.seq}卷
+                      第{numberParseChina(currentChapter?.subsection || 0)}卷
                       <CaretDownOutlined/>
                     </Button>
                   </Dropdown>
@@ -282,48 +310,78 @@ export default function() {
                   <Tooltip title='帮助'>
                     <Button shape={'circle'} icon={<QuestionOutlined/>} size={'small'}/>
                   </Tooltip>
-                  <Button shape={'round'} type={'primary'} size={'small'}>删除</Button>
-                  <Button shape={'round'} size={'small'}>保存</Button>
-                  <Button shape={'round'} size={'small'}
-                          style={{ backgroundColor: '#0067E6', color: 'white' }}>
-                    发布
-                  </Button>
+                  {currentChapter?.type == 'draft' && <>
+                    <Button shape={'round'} type={'primary'} size={'small'} onClick={onDelete}>删除</Button>
+                    <Spin spinning={saveLoading == undefined ? false : saveLoading}>
+                      <Button shape={'round'} size={'small'} onClick={onSave}>保存</Button>
+                    </Spin>
+                    <Spin spinning={saveLoading == undefined ? false : saveLoading}>
+                      <Button shape={'round'} size={'small'} onClick={onPublish}
+                              style={{ backgroundColor: '#0067E6', color: 'white' }}>
+                        发布
+                      </Button>
+                    </Spin></>}
+                  {currentChapter?.type != 'draft' && <>
+                    <Button shape={'round'} type={'primary'} size={'small'} onClick={onDelete}>删除</Button>
+                    <Spin spinning={saveLoading == undefined ? false : saveLoading}>
+                      <Button shape={'round'} size={'small'} onClick={() => {
+                        if (canUpdate) {
+                          onSave();
+                          setCanUpdate(false);
+                        } else {
+                          setCanUpdate(true);
+                        }
+                      }}>
+                        {canUpdate && '保存' || '修改'}
+                      </Button>
+                    </Spin>
+                    {currentChapter?.type == 'recycle' &&
+                    <Spin spinning={saveLoading == undefined ? false : saveLoading}>
+                      <Button shape={'round'} size={'small'} onClick={onPublish}
+                              style={{ backgroundColor: '#0067E6', color: 'white' }}>
+                        重新发布
+                      </Button>
+                    </Spin>}</>}
                 </Space>
               </Col>
             </Row>
           </Header>
           <Content className={styles.writeContent}>
-            <div className={styles.chapterBody}>
-              <div className={styles.scrollDiv}>
-                <Slate editor={titleEditor} value={title} onChange={value => setTitle(value)}>
-                  <Editable style={{ fontSize: 20, backgroundColor: 'inherit', borderBottom: '1px solid #e0e0e0' }}
-                            placeholder='请输入章节号和章节名。示例："第一章 起始"'/>
-                </Slate>
-                <Slate editor={editor} value={value} onChange={value => setValue(value)}>
-                  <Editable onKeyDown={event => {
-                    if (event.keyCode == 9) {
-                      editor.insertText('\t');
-                      event.preventDefault();
-                    }
-                    if (event.keyCode == 13) {
-                      editor.insertText('\n\t');
-                      event.preventDefault();
-                    }
-                  }}
-                            className={styles.writeArea}
-                            placeholder="输入正文..."
-                  />
-                </Slate>
-                <Divider type={'horizontal'}/>
-                <div style={{ width: '100%', textAlign: 'center' }}>
-                  <a style={{ fontSize: 13, color: '#bfbfbf', alignSelf: 'center' }}>+ 作者的话</a>
-                </div>
-              </div>
+            {(currentChapter?.type == 'draft' || canUpdate) &&
+            <div className={styles.writeOpGroup}>
+              <Tooltip title='回退'>
+                <Button icon={<RollbackOutlined/>} className={styles.opBtn} onClick={editor.undo}/>
+              </Tooltip>
+              <Tooltip title='前进'>
+                <Button icon={<ArrowRightOutlined/>} className={styles.opBtn} onClick={editor.redo}/>
+              </Tooltip>
+              <Tooltip title='历史版本'>
+                <Button icon={<HistoryOutlined/>} className={styles.opBtn}/>
+              </Tooltip>
             </div>
+            }
+            <Editor editor={editor}
+                    key={currentChapter?.id}
+                    currentItem={currentChapter}
+                    write={write}
+                    disable={currentChapter?.type != 'draft' && !canUpdate}
+                    setWrite={setWrite}/>
           </Content>
         </Layout>
       </Layout>
       }
-    </Skeleton>
+    </div>
   );
 }
+
+export const nodesConvert = (nodes: Node[]) => {
+  let content = '';
+  nodes.forEach((item, index) => {
+    // @ts-ignore
+    content += item.children[0].text;
+    if (index != nodes.length - 1) {
+      content += '\n';
+    }
+  });
+  return content;
+};

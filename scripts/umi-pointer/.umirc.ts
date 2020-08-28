@@ -3,7 +3,9 @@ import { defineConfig } from 'umi';
 export default defineConfig({
   locale: {
     default: 'zh-CN',
+    useLocalStorage: false,
     antd: true,
+    title: true,
     baseNavigator: true,
     baseSeparator: '-',
   },

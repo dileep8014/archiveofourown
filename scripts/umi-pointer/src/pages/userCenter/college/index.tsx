@@ -3,16 +3,16 @@ import Field from '@ant-design/pro-field';
 import React from 'react';
 import { useModel } from 'umi';
 import { useRequest } from '@umijs/hooks';
-import service from '@/component/service';
 import { Button, Descriptions, Skeleton } from 'antd';
 import DescriptionsItem from 'antd/es/descriptions/Item';
 import Paragraph from 'antd/es/typography/Paragraph';
+import { userService } from '@/service/user';
 
 export default function CollegeList() {
 
   const { user, userLoading } = useModel('user', model => ({ user: model.user, userLoading: model.loading }));
 
-  const { data, loading, pagination } = useRequest(service.UserCollege, { paginated: true });
+  const { data, loading, pagination } = useRequest(userService.UserCollege, { paginated: true });
 
   return (
     <Skeleton loading={userLoading && loading}>

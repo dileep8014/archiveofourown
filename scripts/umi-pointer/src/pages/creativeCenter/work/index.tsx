@@ -2,18 +2,18 @@ import React, { useState } from 'react';
 import { Button, Card, Skeleton } from 'antd';
 import { useModel, history } from 'umi';
 import { useRequest } from '@umijs/hooks';
-import service from '@/component/service';
 import ErrorPage from '@/component/errorpage/errorpage';
 import ProList from '@ant-design/pro-list';
 import ButtonGroup from 'antd/es/button/button-group';
 import { UnorderedListOutlined, TableOutlined } from '@ant-design/icons';
 import WorkItem from '@/pages/creativeCenter/workItem/workItem';
+import { workService } from '@/service/work';
 
 export default function MyWork() {
 
   const { user } = useModel('user', model => ({ user: model.user }));
 
-  const { data, loading, error, pagination } = useRequest(service.MineWorks, { paginated: true });
+  const { data, loading, error, pagination } = useRequest(workService.MineWorks, { paginated: true });
 
   const [list, unList] = useState(true);
 

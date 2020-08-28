@@ -1,6 +1,5 @@
 import { Button, Card, Col, Row } from 'antd';
 import React from 'react';
-import { history } from 'umi';
 
 export interface WorkItemData {
   id: number

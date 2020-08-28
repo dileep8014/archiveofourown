@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import service from '@/component/service';
 import { message } from 'antd';
 import { useRequest } from '@umijs/hooks';
 import moment from 'moment';
+import { userService } from '@/service/user';
 
 export type UserModelState = {
   id: number,
@@ -27,9 +27,9 @@ export default function useCurrentUserModel(): {
   loading: boolean,
 } {
 
-  const { data, error, refresh, loading } = useRequest(service.QueryCurrentUser);
+  const { data, error, refresh, loading } = useRequest(userService.QueryCurrentUser);
   const [user, update] = useState<UserModelState>(data);
-  const { run: signIn } = useRequest(service.SignIn, {
+  const { run: signIn } = useRequest(userService.SignIn, {
     manual: true, onSuccess: res => {
       if (res == 'ok') {
         refresh().then(r => {
@@ -38,14 +38,14 @@ export default function useCurrentUserModel(): {
       }
     },
   });
-  const { run: signOut } = useRequest(service.SignOut, {
+  const { run: signOut } = useRequest(userService.SignOut, {
     manual: true, onSuccess: res => {
       if (res == 'ok') {
         update(null);
       }
     },
   });
-  const { run: updateUserInfo } = useRequest(service.Update, {
+  const { run: updateUserInfo } = useRequest(userService.Update, {
     manual: true, onSuccess: (res, params) => {
       if (res == 'ok') {
         // @ts-ignore

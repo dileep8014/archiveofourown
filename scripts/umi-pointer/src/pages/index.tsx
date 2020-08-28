@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './index.less';
 import { useRequest } from '@umijs/hooks';
-import service from '@/component/service';
 import ErrorPage from '@/component/errorpage/errorpage';
 import { Button, Card, Col, Divider, Modal, Row, Skeleton, Space, Tag } from 'antd';
 import ProList from '@ant-design/pro-list';
@@ -11,17 +10,19 @@ import moment from 'moment';
 import Text from 'antd/es/typography/Text';
 import SignForm from '@/component/sign/sign';
 import Paragraph from 'antd/es/typography/Paragraph';
+import { workService } from '@/service/work';
+import { newsService } from '@/service/news';
 
 
 export default () => {
 
   const { user } = useModel('user', model => ({ user: model.user }));
   const { run: fetchWorks, data, error, loading } = useRequest(
-    ({ current, pageSize }) => service.SubWorks({ current, pageSize }), {
+    ({ current, pageSize }) => workService.SubWorks({ current, pageSize }), {
       manual: true,
     });
   const { data: news } = useRequest(
-    ({ current, pageSize }) => service.News({ current, pageSize }), {
+    ({ current, pageSize }) => newsService.News({ current, pageSize }), {
       defaultParams: [{ current: 1, pageSize: 3 }],
     });
   const [canVisit, setCanVisit] = useState(false);
@@ -60,7 +61,11 @@ export default () => {
         <Skeleton loading={loading}>
           {user && <ProList
             size='large'
-            title={<div><span>最新订阅</span> <Divider type={'horizontal'}/></div>}
+            title={<div>
+              <span>最新订阅</span>
+              <Link to='/subscribe' style={{float:'right'}}>全部</Link>
+              <Divider type={'horizontal'}/>
+            </div>}
             split={false}
             itemLayout='vertical'
             dataSource={data?.list || []}
