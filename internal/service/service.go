@@ -2,17 +2,16 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/shyptr/archiveofourown/pkg/runner"
+	"github.com/shyptr/archiveofourown/global"
+	"github.com/shyptr/archiveofourown/pkg/tracer"
+	"gorm.io/gorm"
 )
 
 type Service struct {
-	tx *runner.Runner
+	ctx *gin.Context
+	db  *gorm.DB
 }
 
 func NewService(c *gin.Context) *Service {
-	return &Service{tx: runner.NewRunner(c)}
-}
-
-func (svc *Service) Finish() {
-	svc.tx.Close()
+	return &Service{ctx: c, db: tracer.SetSpanToGorm(c, global.Engine)}
 }

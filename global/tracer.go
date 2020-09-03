@@ -11,7 +11,7 @@ var Tracer opentracing.Tracer
 func SetupTracer() (err error) {
 	defer errwrap.Wrap(&err, "init.setupTracer")
 
-	jaegerTracer, _, err := tracer.NewJaegerTracer("archiveofourown", "127.0.0.1:6831")
+	jaegerTracer, _, err := tracer.NewJaegerTracer("pointer", "127.0.0.1:6831")
 	if err != nil {
 		return
 	}

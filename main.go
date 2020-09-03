@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/shyptr/archiveofourown/global"
 	"github.com/shyptr/archiveofourown/internal/routers"
-	"github.com/shyptr/archiveofourown/pkg/logger"
 	"log"
 	"net/http"
 	"os"
@@ -19,11 +18,12 @@ func init() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	global.SetupLogger()
 	err = global.SetupDBEngine()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	logger.SetupLogger()
+
 	err = global.SetupTracer()
 	if err != nil {
 		log.Fatalln(err)

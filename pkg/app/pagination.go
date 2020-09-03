@@ -6,28 +6,19 @@ import (
 	"github.com/shyptr/archiveofourown/pkg/convert"
 )
 
-func GetPage(c *gin.Context) int {
+func GetPage(c *gin.Context) (size, offset int) {
 	page := convert.StrTo(c.Query("page")).MustInt()
 	if page <= 0 {
-		return 1
+		page = 1
 	}
-	return page
-}
+	size = convert.StrTo(c.Query("page_size")).MustInt()
+	if size <= 0 {
+		size = 1
+	}
+	if size > global.AppSetting.MaxPageSize {
+		size = global.AppSetting.MaxPageSize
+	}
 
-func GetPageSize(c *gin.Context) int {
-	pageSize := convert.StrTo(c.Query("page_size")).MustInt()
-	if pageSize <= 0 {
-		return global.AppSetting.DefaultPageSize
-	}
-	if pageSize > global.AppSetting.MaxPageSize {
-		return global.AppSetting.MaxPageSize
-	}
-	return pageSize
-}
-
-func GetPageOffset(page, pageSize int) int {
-	if page > 0 {
-		return (page - 1) * pageSize
-	}
-	return 0
+	offset = (page - 1) * size
+	return
 }

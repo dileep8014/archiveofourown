@@ -1,16 +1,4 @@
 definitions:
-  app.Pager:
-    properties:
-      page:
-        example: 1
-        type: integer
-      pageSize:
-        example: 10
-        type: integer
-      totalRows:
-        example: 100
-        type: integer
-    type: object
   errcode.Error:
     properties:
       code:
@@ -88,9 +76,8 @@ definitions:
         items:
           $ref: '#/definitions/model.Article'
         type: array
-      pager:
-        $ref: '#/definitions/app.Pager'
-        type: object
+      total:
+        type: integer
     type: object
   model.Category:
     properties:
@@ -100,12 +87,6 @@ definitions:
         type: integer
       name:
         example: category name
-        type: string
-    type: object
-  service.AuthResponse:
-    properties:
-      token:
-        example: token string
         type: string
     type: object
   service.CategoryRequest:
@@ -444,6 +425,19 @@ paths:
       - description: 用户ID
         in: path
         name: id
+        required: true
+        type: integer
+      - description: 年份
+        in: query
+        name: year
+        required: true
+        type: integer
+      - description: 月份
+        in: query
+        maximum: 12
+        minimum: 1
+        name: month
+        required: true
         type: integer
       produces:
       - application/json
@@ -451,7 +445,7 @@ paths:
         "200":
           description: 成功
           schema:
-            $ref: '#/definitions/service.AuthResponse'
+            type: string
         "400":
           description: 请求错误
           schema:
@@ -460,7 +454,7 @@ paths:
           description: 内部错误
           schema:
             $ref: '#/definitions/errcode.Error'
-      summary: 获取token
+      summary: 获取创作日历
       tags:
-      - Auth
+      - Calendar
 swagger: "2.0"

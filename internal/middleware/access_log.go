@@ -1,35 +1,34 @@
 package middleware
 
 import (
-	"bytes"
 	"github.com/gin-gonic/gin"
-	"github.com/shyptr/archiveofourown/pkg/logger"
+	"github.com/opentracing/opentracing-go"
+	"github.com/rs/zerolog"
+	"github.com/shyptr/archiveofourown/global"
+	"github.com/uber/jaeger-client-go"
 	"time"
 )
 
-type AccessLogWriter struct {
-	gin.ResponseWriter
-	body *bytes.Buffer
-}
-
-func (w AccessLogWriter) Write(p []byte) (int, error) {
-	if n, err := w.body.Write(p); err != nil {
-		return n, err
-	}
-	return w.ResponseWriter.Write(p)
-}
-
 func AccessLog() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		log := logger.Get().With().Str("trace_id", c.Value("x-trace-id").(string)).Logger().
-			With().Str("span_id", c.Value("x-span-id").(string)).Logger()
+		span := c.Value("span").(opentracing.Span)
+		spanContext := span.Context().(jaeger.SpanContext)
+		log := global.Logger.With().Str("trace_id", spanContext.TraceID().String()).Logger().
+			With().Str("span_id", spanContext.SpanID().String()).Logger()
+		log = log.Hook(AccessLogHook(c, span))
 		c.Set("logger", log)
-		defer logger.Put(log)
-		bodyWriter := &AccessLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
-		c.Writer = bodyWriter
 		beginTime := time.Now()
 		c.Next()
-		log.Info().Int("status", bodyWriter.Status()).TimeDiff("takeUp", time.Now(), beginTime).
+		log.Info().Int("status", c.Writer.Status()).TimeDiff("takeUp", time.Now(), beginTime).
 			Str("ip", c.ClientIP()).Str("method", c.Request.Method).Str("path", c.Request.RequestURI).Send()
+	}
+}
+
+func AccessLogHook(c *gin.Context, span opentracing.Span) zerolog.HookFunc {
+	return func(e *zerolog.Event, level zerolog.Level, message string) {
+		if level >= zerolog.ErrorLevel {
+			span.SetTag("gin.method", c.Request.Method)
+			span.SetTag("gin.error", c.Errors.String())
+		}
 	}
 }

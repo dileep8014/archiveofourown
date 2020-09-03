@@ -1,9 +1,11 @@
 package app
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+	"strconv"
 	"strings"
 )
 
@@ -30,9 +32,17 @@ func (v ValidErrors) Errors() []string {
 	return errs
 }
 
-func BindAndValid(c *gin.Context, v interface{}) (bool, ValidErrors) {
+func ShouldParamConvertInt(c *gin.Context, key string) (int, error) {
+	v := c.Param(key)
+	if v == "" {
+		return 0, fmt.Errorf("uri 参数 %s 为空", key)
+	}
+	return strconv.Atoi(v)
+}
+
+func BindAndValid(c *gin.Context, v interface{}, bind func(obj interface{}) error) (bool, ValidErrors) {
 	var errs ValidErrors
-	err := c.ShouldBind(v)
+	err := bind(v)
 	if err != nil {
 		trans, _ := c.Value("trans").(ut.Translator)
 		verrs, ok := err.(validator.ValidationErrors)

@@ -6,6 +6,7 @@ import (
 	"github.com/shyptr/archiveofourown/global"
 	"github.com/shyptr/archiveofourown/internal/middleware"
 	v1 "github.com/shyptr/archiveofourown/internal/routers/api/v1"
+	"github.com/shyptr/archiveofourown/internal/routers/api/v1/admin"
 	"github.com/shyptr/archiveofourown/pkg/limiter"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -24,7 +25,6 @@ func NewRouter() *gin.Engine {
 	r.Use(
 		middleware.Tracing(),
 		middleware.AccessLog(),
-		middleware.Tx(),
 		middleware.Recovery(),
 		middleware.RateLimiter(methodLimiters),
 		middleware.ContextTimeout(time.Duration(global.AppSetting.ContextTimeout)*time.Second),
@@ -34,13 +34,27 @@ func NewRouter() *gin.Engine {
 	//swagger
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	//auth
-	r.GET("/auth", v1.NewAuth().Get)
 	r.GET("/auth/:id", v1.NewAuth().Get)
 
+	// common
 	apiv1 := r.Group("/api/v1", middleware.Jwt())
 	{
+		v1.NewCalendar().Router(apiv1)
 		v1.NewCategory().Router(apiv1)
-		v1.NewArticle().Router(apiv1)
+		v1.NewChapter().Router(apiv1)
+		v1.NewCollege().Router(apiv1)
+		v1.NewComment().Router(apiv1)
+		v1.NewIdentify().Router(apiv1)
+		v1.NewMessage().Router(apiv1)
+		v1.NewNews().Router(apiv1)
+	}
+
+	// admin
+	adminApiv1 := r.Group("/api/v1/admin", middleware.Jwt(), middleware.Root())
+	{
+		admin.NewCategory().Router(adminApiv1)
+		admin.NewChapter().Router(adminApiv1)
+		admin.NewNews().Router(adminApiv1)
 	}
 
 	return r

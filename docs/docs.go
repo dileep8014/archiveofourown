@@ -508,22 +508,39 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Auth"
+                    "Calendar"
                 ],
-                "summary": "获取token",
+                "summary": "获取创作日历",
                 "parameters": [
                     {
                         "type": "integer",
                         "description": "用户ID",
                         "name": "id",
-                        "in": "path"
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "年份",
+                        "name": "year",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "maximum": 12,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "月份",
+                        "name": "month",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "成功",
                         "schema": {
-                            "$ref": "#/definitions/service.AuthResponse"
+                            "type": "string"
                         }
                     },
                     "400": {
@@ -543,23 +560,6 @@ var doc = `{
         }
     },
     "definitions": {
-        "app.Pager": {
-            "type": "object",
-            "properties": {
-                "page": {
-                    "type": "integer",
-                    "example": 1
-                },
-                "pageSize": {
-                    "type": "integer",
-                    "example": 10
-                },
-                "totalRows": {
-                    "type": "integer",
-                    "example": 100
-                }
-            }
-        },
         "errcode.Error": {
             "type": "object",
             "properties": {
@@ -663,9 +663,8 @@ var doc = `{
                         "$ref": "#/definitions/model.Article"
                     }
                 },
-                "pager": {
-                    "type": "object",
-                    "$ref": "#/definitions/app.Pager"
+                "total": {
+                    "type": "integer"
                 }
             }
         },
@@ -680,15 +679,6 @@ var doc = `{
                 "name": {
                     "type": "string",
                     "example": "category name"
-                }
-            }
-        },
-        "service.AuthResponse": {
-            "type": "object",
-            "properties": {
-                "token": {
-                    "type": "string",
-                    "example": "token string"
                 }
             }
         },

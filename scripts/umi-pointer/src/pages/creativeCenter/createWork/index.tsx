@@ -74,11 +74,11 @@ export default function NewWork(props: { cancel: () => void }) {
       <div style={{ paddingTop: 20, textAlign: 'center' }}>
         {current == 0 && <Radio.Group onChange={e => setType(e.target.value)} value={type}>
           <Card bordered={false} style={{ textAlign: 'left' }}>
-            <Card.Meta title={<Radio style={radioStyle} value={1}>同人</Radio>}
+            <Card.Meta title={<Radio style={radioStyle} value={0}>同人</Radio>}
                        description='利用原有的漫画、动画、小说、影视作品中的人物角色、故事情节或背景设定等元素进行的二次创作小说。'/>
           </Card>
           <Card bordered={false} style={{ textAlign: 'left' }}>
-            <Card.Meta title={<Radio style={radioStyle} value={2}>原创</Radio>}
+            <Card.Meta title={<Radio style={radioStyle} value={1}>原创</Radio>}
                        description='以玄幻/历史/都市/灵异/仙侠/游戏/二次元/武侠/军事/言情/青春/悬疑/科幻等题材创作的类型小说。'/>
           </Card>
           <Button type="primary" onClick={() => {
@@ -103,19 +103,29 @@ export default function NewWork(props: { cancel: () => void }) {
               <Row gutter={20}>
                 <Col span={12}>
                   <Form.Item name='category' rules={[{ required: true, message: '请选择分类' }]}>
+                    {type == 0 &&
                     <Select showSearch placeholder="请选择"
                             onSelect={(v: string) => ProgressOpt(() => fetchTopics({ categoryId: parseInt(v) }))}>
                       {category && category.map((item: { id: number; name: string; }) =>
                         <Option key={item.id} value={item.id.toString()}>{item.name}</Option>)}
-                    </Select>
+                    </Select>}
+                    {type == 1 &&
+                    <Select value='1'>
+                      <Option key='1' value='1'>原创</Option>
+                    </Select>}
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item name='topic' rules={[{ required: true, message: '请选择类别' }]}>
+                    {type == 0 &&
                     <Select showSearch placeholder="请选择" loading={topicsLoad}>
                       {topics && topics.map((item: { id: number; name: string; }) =>
                         <Option key={item.id} value={item.id.toString()}>{item.name}</Option>)}
-                    </Select>
+                    </Select>}
+                    {type == 1 &&
+                    <Select value='1'>
+                      <Option key='1' value='1'>原创</Option>
+                    </Select>}
                   </Form.Item>
                 </Col>
               </Row>

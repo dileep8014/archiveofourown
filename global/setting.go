@@ -11,6 +11,7 @@ var (
 	DatabaseSetting *setting.DatabaseSetting
 	JWTSetting      *setting.JwtSetting
 	EmailSetting    *setting.EmailSetting
+	MQSetting       *setting.MQSetting
 )
 
 func SetupSetting() (err error) {
@@ -37,6 +38,10 @@ func SetupSetting() (err error) {
 		return
 	}
 	err = st.ReadSection("Email", &EmailSetting)
+	if err != nil {
+		return
+	}
+	err = st.ReadSection("MQ", &MQSetting)
 	if err != nil {
 		return
 	}

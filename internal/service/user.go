@@ -1,14 +1,13 @@
 package service
 
-import (
-	"github.com/shyptr/archiveofourown/internal/model"
-	"github.com/shyptr/archiveofourown/pkg/errwrap"
-)
-
-func (svc *Service) GetUser(id int64) (user model.User, err error) {
-	defer errwrap.Wrap(&err, "service.user.get")
-
-	user.ID = id
-	user, err = user.Get(svc.tx)
-	return
+// User response example
+type UserResponse struct {
+	ID        int64  `json:"id"`
+	Username  string `json:"username"`
+	Email     string `json:"email"`
+	Root      bool   `json:"root"`
+	WorksNums int64  `json:"worksNums"`
+	WorkDay   int64  `json:"workDay"`
+	Words     int64  `json:"words"`
+	FansNums  int64  `json:"fansNums"`
 }

@@ -1,16 +1,15 @@
 package app
 
 import (
-	"encoding/hex"
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/shyptr/archiveofourown/global"
 	"time"
 )
 
 type Claims struct {
-	ID       string `json:"id"`
+	ID       int64  `json:"id"`
 	Username string `json:"username"`
+	Root     bool   `json:"root"`
 	jwt.StandardClaims
 }
 
@@ -18,12 +17,13 @@ func GetJwtSecret() []byte {
 	return []byte(global.JWTSetting.Secret)
 }
 
-func GenerateToken(id int64, username string) (string, error) {
+func GenerateToken(id int64, username string, root bool) (string, error) {
 	now := time.Now()
 	expireTime := now.Add(time.Duration(global.JWTSetting.Expire) * time.Second)
 	claims := Claims{
-		ID:       hex.EncodeToString([]byte(fmt.Sprint(id))),
-		Username: hex.EncodeToString([]byte(username)),
+		ID:       id,
+		Username: username,
+		Root:     root,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(),
 			Issuer:    global.JWTSetting.Issuer,

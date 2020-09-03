@@ -9,6 +9,10 @@ func NewUser() User {
 	return User{}
 }
 
-func (u User) Router(api *gin.RouterGroup) {
-
+func (u User) Router(api gin.IRouter) {
+	// 获取当前登录用户信息
+	api.GET("/user/currentUser")
+	// 获取指定用户信息
+	api.GET("/user/:id")
+	//
 }

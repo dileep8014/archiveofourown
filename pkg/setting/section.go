@@ -1,6 +1,9 @@
 package setting
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type ServerSetting struct {
 	RunMode      string
@@ -46,6 +49,16 @@ type EmailSetting struct {
 	To       []string
 }
 
+type MQSetting struct {
+	Username string
+	Password string
+	Host     string
+}
+
 func (s *Setting) ReadSection(k string, v interface{}) error {
-	return s.vp.UnmarshalKey(k, v)
+	err := s.vp.UnmarshalKey(k, v)
+	if err != nil {
+		return fmt.Errorf("error in binding %s: %w", k, err)
+	}
+	return nil
 }

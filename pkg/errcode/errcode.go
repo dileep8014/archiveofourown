@@ -9,6 +9,7 @@ type Error struct {
 	Code    int
 	Msg     string
 	Details []string
+	Err     error
 }
 
 var codes = map[int]string{}
@@ -31,6 +32,11 @@ func (e *Error) Msgf(args ...interface{}) string {
 
 func (e *Error) WithDetails(details ...string) *Error {
 	e.Details = append(e.Details, details...)
+	return e
+}
+
+func (e *Error) WithError(err error) *Error {
+	e.Err = err
 	return e
 }
 

@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
 	"github.com/shyptr/archiveofourown/pkg/errcode"
 	"net/http"
 )
@@ -33,6 +34,13 @@ func (r *Response) ToResponseList(list interface{}, totalRows int) {
 }
 
 func (r *Response) ToErrorResponse(err *errcode.Error) {
+	if err.Err != nil {
+		r.Ctx.Error(err)
+
+		logger := r.Ctx.Value("logger").(zerolog.Logger)
+		logger.Error().Caller(1).Err(err.Err).Send()
+	}
+
 	res := gin.H{"code": err.Code, "msg": err.Msg}
 	details := err.Details
 	if len(details) > 0 {

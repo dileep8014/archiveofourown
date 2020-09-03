@@ -1,12 +1,10 @@
 package middleware
 
 import (
-	"encoding/hex"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/shyptr/archiveofourown/pkg/app"
 	"github.com/shyptr/archiveofourown/pkg/errcode"
-	"strconv"
 )
 
 func Jwt() gin.HandlerFunc {
@@ -28,11 +26,9 @@ func Jwt() gin.HandlerFunc {
 					ecode = errcode.UnauthorizedTokenError
 				}
 			} else {
-				idStr, _ := hex.DecodeString(claims.ID)
-				id, _ := strconv.ParseInt(string(idStr), 10, 64)
-				username, _ := hex.DecodeString(claims.Username)
-				c.Set("me.id", id)
-				c.Set("me.name", string(username))
+				c.Set("me.id", claims.ID)
+				c.Set("me.name", claims.Username)
+				c.Set("me.root", claims.Root)
 			}
 		}
 		if ecode != errcode.Success {
