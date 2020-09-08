@@ -27,13 +27,16 @@ func (e *Email) SendMail(to []string, subject, body string) (err error) {
 	defer errwrap.Add(&err, "email.send")
 
 	m := gomail.NewMessage()
-	m.SetHeader("From", e.From)
+	m.SetAddressHeader("From", e.UserName, e.From)
 	m.SetHeader("To", to...)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", body)
 
 	dialer := gomail.NewDialer(e.Host, e.Port, e.UserName, e.Password)
-	dialer.TLSConfig = &tls.Config{InsecureSkipVerify: e.IsSSL}
+	if e.IsSSL {
+		//dialer.SSL = e.IsSSL
+		dialer.TLSConfig = &tls.Config{InsecureSkipVerify: e.IsSSL}
+	}
 	err = dialer.DialAndSend()
 	return
 }

@@ -16,10 +16,11 @@ func (c Comment) Router(api gin.IRouter) {
 }
 
 // @Summary 添加评论
-// @Tags Comment
+// @Tags 评论
 // @Accept json
 // @Produce json
-// @Param param body service.CommentRequest
+// @Param Authorization header string true "token"
+// @Param request body service.CommentRequest true "请求参数"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
@@ -29,9 +30,10 @@ func (c Comment) Create(ctx *gin.Context) {
 }
 
 // @Summary 获取评论列表
-// @Tags Comment
+// @Tags 评论
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param objType path int true "评论对象类型,0-作品,1-章节,2-选段,3-公告" Enums(0,1,2,3)
 // @Param objID path int true "评论对象ID"
 // @Param pageSize query int true "页大小"
@@ -45,9 +47,10 @@ func (c Comment) List(ctx *gin.Context) {
 }
 
 // @Summary 删除评论
-// @Tags Comment
+// @Tags 评论
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "评论ID"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"

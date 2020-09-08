@@ -1,4 +1,4 @@
-import { StyleState } from '@/pages/userCenter/userstyle';
+import { UserSetting } from '@/pages/userCenter/userstyle';
 import { UserModelState } from '@/models/user';
 import request from './request';
 
@@ -12,39 +12,61 @@ export const userService = {
     }
     return request('/api/v1/users/topics', { data: params });
   },
-  GetStyles: function() {
-    return request('/api/v1/users/styles');
+  CurrentUserSetting: function() {
+    return request('/api/v1/currentUser/setting');
   },
-  UpdateStyles: function(styles: StyleState) {
-    return request('/api/v1/users/styles', {
+  UpdateCurrentSetting: function(st: UserSetting) {
+    console.log(st);
+    return request('/api/v1/currentUser/setting', {
       method: 'post',
-      data: styles,
+      data: st,
     });
   },
-  Update: async function(user: UserModelState) {
-    return request('/api/v1/users/update', {
+  Update: async function(user: { username?: string, avatar?: string, gender?: number, introduce?: string }) {
+    return request('/api/v1/currentUser', {
       method: 'post',
       data: user,
     });
   },
-  QueryCurrentUser: function() {
-    return request('/api/v1/users/currentUser');
-  },
-  SignIn: function(account: string, password: string) {
-    return request('/api/v1/users/login', {
+  UpdatePassword: async function(params: { oldPassword: string, password: string }) {
+    return request('/api/v1/currentUser/password', {
       method: 'post',
-      data: { account: account, password: password },
+      data: params,
+    });
+  },
+  UpdateEmail: async function(params: { email: string, password: string }) {
+    return request('/api/v1/currentUser/email', {
+      method: 'post',
+      data: params,
+    });
+  },
+  QueryCurrentUser: function() {
+    return request('/api/v1/currentUser');
+  },
+  SignIn: function(params: { username: string, password: string, rememberMe: boolean }) {
+    return request('/api/v1/login', {
+      method: 'post',
+      data: params,
     });
   },
   SignOut: function() {
-    return request('/api/v1/users/logOut', {
+    return request('/api/v1/logout', {
       method: 'post',
     });
   },
-  SignUp: async function(account: string, email: string, password: string) {
-    return request('/api/v1/users/create', {
+  SignUp: function(email: string) {
+    return request('/api/v1/register', {
       method: 'post',
-      data: { account: account, email: email, password: password },
+      data: { email: email },
+    });
+  },
+  Identify: function(path: string) {
+    return request(`/api/v1/register/identify`, { params: { path: path } });
+  },
+  Create: function(params: { email: string, password: string, username: string }) {
+    return request('/api/v1/register/create', {
+      method: 'post',
+      data: params,
     });
   },
 };

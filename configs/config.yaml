@@ -1,5 +1,6 @@
 Server:
   RunMode: debug
+  BaseUrl: http://localhost:8008
   HttpPort: 8008
   ReadTimeOut: 60
   WriteTimeOut: 60
@@ -15,23 +16,33 @@ DATABASE:
   Username: root
   Password: root
   Host: 127.0.0.1:3306
-  DBName: archive
+  DBName: pointer
   CharSet: utf8
   ParseTime: true
   MaxIdleConns: 10
   MaxOpenConns: 30
 JWT:
-  Secret: shyptr
+  Secret: shy-anchovy
   Issuer: archiveofourown
   Expire: 28800
 Email:
-  Host: smtp.qq.com
+  Host: smtp.163.com
   Port: 465
-  UserName: xxxx@qq.com
-  Password: xxxx
+  UserName: xxx@163.com
+  Password: xxx
   IsSSL: true
-  From: xxxx@qq.com
+  From: Pointer
   To:
-    - xxxx@qq.com
-    - xxxx@gmail.com
+    - xxx@qq.com
+    - xxx@gmail.com
+MQ:
+  Username: admin
+  Password: admin
+  Host: 127.0.0.1:5672
+Redis:
+  Host: :6379
+  Password: admin
+  ConnectTimeout: 60
+  ReadTimeOut: 10
+  WriteTimeOut: 10
 

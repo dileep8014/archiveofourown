@@ -15,9 +15,10 @@ func (n News) Router(api gin.IRouter) {
 }
 
 // @Summary 公告列表
-// @Tags News
+// @Tags 公告
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param pageSize query int true "页大小"
 // @Param page query int true "当前页"
 // @Success 200 {object} service.NewsPageResponse "成功"
@@ -29,9 +30,10 @@ func (n News) List(ctx *gin.Context) {
 }
 
 // @Summary 公告内容
-// @Tags News
+// @Tags 公告
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "公告ID"
 // @Success 200 {object} service.NewsResponse "成功"
 // @Failure 400 {object} errcode.Error "请求错误"

@@ -106,7 +106,7 @@ const RightHeader: React.FC = () => {
             <Menu.Item key='out'>登出</Menu.Item>
           </Menu>}>
           <span className={styles.userAvatar}>
-            <Avatar src={user?.avatar}/><span>{user?.name}</span>
+            <Avatar src={user?.avatar}/><span> {user?.username}</span>
           </span>
         </Dropdown>
         <Link to='/msgCenter' className={styles.rightBtn}>消息</Link>

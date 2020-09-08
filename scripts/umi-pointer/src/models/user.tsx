@@ -1,75 +1,70 @@
 import { useCallback, useEffect, useState } from 'react';
-import { message } from 'antd';
 import { useRequest } from '@umijs/hooks';
 import moment from 'moment';
 import { userService } from '@/service/user';
 
 export type UserModelState = {
   id: number,
-  name: string,
+  username: string,
   email: string,
   avatar: string,
-  gender: string,
-  birthday: moment.Moment | null
-  phone: number | null,
+  gender: number,
   introduce: string,
+  worksNums: number,
   root: boolean,
   workDay: number,
   words: number,
-  fans: number,
+  fansNums: number,
+  createdAt: moment.Moment,
 } | null
 
 export default function useCurrentUserModel(): {
-  signin: (account: string, password: string) => void;
+  signin: (params: { username: string, password: string, rememberMe: boolean }) => void;
   signout: () => void;
-  setUser: (value: UserModelState) => void;
+  setUser: (value: { username?: string, avatar?: string, gender?: number, introduce?: string }) => void;
   user: UserModelState,
   loading: boolean,
 } {
 
-  const { data, error, refresh, loading } = useRequest(userService.QueryCurrentUser);
-  const [user, update] = useState<UserModelState>(data);
+  const { data, refresh, loading } = useRequest(userService.QueryCurrentUser);
+  const [user, update] = useState<UserModelState>(null);
   const { run: signIn } = useRequest(userService.SignIn, {
-    manual: true, onSuccess: res => {
-      if (res == 'ok') {
-        refresh().then(r => {
-          update(r);
-        });
+    manual: true, onSuccess: (res, params) => {
+      if (res.code == 0) {
+        refresh();
+        localStorage.setItem('currentUser', params[0].username);
+        localStorage.setItem('currentPass', params[0].password);
       }
     },
   });
   const { run: signOut } = useRequest(userService.SignOut, {
     manual: true, onSuccess: res => {
-      if (res == 'ok') {
-        update(null);
-      }
+      update(null);
+      localStorage.removeItem('Authorization');
     },
   });
   const { run: updateUserInfo } = useRequest(userService.Update, {
     manual: true, onSuccess: (res, params) => {
-      if (res == 'ok') {
+      if (res.code == 0) {
         // @ts-ignore
-        update(params[0]);
+        update({ ...user, ...params[0] });
       }
     },
   });
 
   useEffect(() => {
-    if (data) {
-      update(data);
+    if (data && data.code == 0) {
+      update(data.data);
     }
-    if (error) {
-      message.error(error);
-    }
-  }, [data, error]);
+  }, [data]);
 
-  const setUser = useCallback((userInfo: UserModelState) => {
+  const setUser = useCallback((userInfo: { username?: string, avatar?: string, gender?: number, introduce?: string }) => {
     updateUserInfo(userInfo);
   }, []);
 
-  const signin = useCallback((account: string, password: string) => {
+  const signin = useCallback((params: { username: string, password: string, rememberMe: boolean }) => {
     // signin implementation
-    signIn(account, password);
+    signIn(params);
   }, []);
 
   const signout = useCallback(() => {

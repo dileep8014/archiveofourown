@@ -24,6 +24,7 @@ func (c Category) Router(api gin.IRouter) {
 // @Tags 分类
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param category body service.CategoryRequest true "分类"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
@@ -33,14 +34,14 @@ func (c Category) Create(ctx *gin.Context) {
 	res := app.NewResponse(ctx)
 	req := service.CategoryRequest{}
 	valid, errs := app.BindAndValid(ctx, &req, ctx.BindJSON)
-	if valid {
+	if !valid {
 		res.ToErrorResponse(errcode.InValidParams.WithDetails(errs.Errors()...))
 		return
 	}
 	svc := service.NewService(ctx)
 	err := svc.CreateCategory(req)
 	if err != nil {
-		res.ToErrorResponse(errcode.ErrorCreateCategoryFail.WithError(err))
+		res.CheckErrorAndResponse(err, errcode.ErrorCreateCategoryFail)
 		return
 	}
 	res.ToResponse(gin.H{})
@@ -50,6 +51,7 @@ func (c Category) Create(ctx *gin.Context) {
 // @Tags 分类
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "分类ID"
 // @Param category body service.CategoryRequest true "分类"
 // @Success 200 {string} string "成功"
@@ -65,14 +67,14 @@ func (c Category) Update(ctx *gin.Context) {
 	}
 	req := service.CategoryRequest{}
 	valid, errs := app.BindAndValid(ctx, &req, ctx.BindJSON)
-	if valid {
+	if !valid {
 		res.ToErrorResponse(errcode.InValidParams.WithDetails(errs.Errors()...))
 		return
 	}
 	svc := service.NewService(ctx)
 	err = svc.UpdateCategory(int64(id), req)
 	if err != nil {
-		res.ToErrorResponse(errcode.ErrorUpdateCategoryFail.WithError(err))
+		res.CheckErrorAndResponse(err, errcode.ErrorUpdateCategoryFail)
 		return
 	}
 	res.ToResponse(gin.H{})
@@ -82,6 +84,7 @@ func (c Category) Update(ctx *gin.Context) {
 // @Tags 分类
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "分类ID"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
@@ -97,7 +100,7 @@ func (c Category) Delete(ctx *gin.Context) {
 	svc := service.NewService(ctx)
 	err = svc.DeleteCategory(int64(id))
 	if err != nil {
-		res.ToErrorResponse(errcode.ErrorDeleteCategoryFail)
+		res.CheckErrorAndResponse(err, errcode.ErrorDeleteCategoryFail)
 		return
 	}
 	res.ToResponse(gin.H{})

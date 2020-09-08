@@ -3,8 +3,8 @@ package app
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+	"github.com/shyptr/archiveofourown/global"
 	"strconv"
 	"strings"
 )
@@ -44,7 +44,7 @@ func BindAndValid(c *gin.Context, v interface{}, bind func(obj interface{}) erro
 	var errs ValidErrors
 	err := bind(v)
 	if err != nil {
-		trans, _ := c.Value("trans").(ut.Translator)
+		trans := global.Translations()
 		verrs, ok := err.(validator.ValidationErrors)
 		if !ok {
 			return true, nil
@@ -55,7 +55,7 @@ func BindAndValid(c *gin.Context, v interface{}, bind func(obj interface{}) erro
 				Msg: value,
 			})
 		}
-		return true, errs
+		return false, errs
 	}
-	return false, nil
+	return true, nil
 }

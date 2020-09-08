@@ -1,15 +1,10 @@
 package mq
 
 import (
-	"context"
 	"encoding/json"
-	"github.com/opentracing/opentracing-go"
+	"github.com/jinzhu/gorm"
 	"github.com/shyptr/archiveofourown/global"
 	"github.com/shyptr/archiveofourown/internal/model"
-	"github.com/shyptr/archiveofourown/pkg/tracer"
-	"github.com/streadway/amqp"
-	"github.com/uber/jaeger-client-go"
-	"gorm.io/gorm"
 	"time"
 )
 
@@ -26,19 +21,12 @@ type CalendarConsumer struct {
 }
 
 func (c CalendarConsumer) Start() {
-
-	// 创建tracer span
-	span, ctx := opentracing.StartSpanFromContextWithTracer(context.Background(), global.Tracer,
-		"calendar mq consumer")
-	var spanContext = span.Context().(jaeger.SpanContext)
-	logger := global.Logger.With().Str("trace_id", spanContext.TraceID().String()).Logger().
-		With().Str("span_id", spanContext.SpanID().String()).Logger()
-	defer span.Finish()
 	// 获取MQ连接
 	conn := getConn()
+	defer conn.Close()
 	channel, err := conn.Channel()
 	if err != nil {
-		logger.Fatal().Caller().AnErr("open channel", err).Send()
+		global.Logger.Fatal().Caller().AnErr("open channel", err).Send()
 	}
 	defer channel.Close()
 	// 定义queue
@@ -51,12 +39,12 @@ func (c CalendarConsumer) Start() {
 		nil,
 	)
 	if err != nil {
-		logger.Fatal().Caller().AnErr("queue declare", err).Send()
+		global.Logger.Fatal().Caller().AnErr("queue declare", err).Send()
 	}
 	// 设置channel的Qos
 	err = channel.Qos(1, 0, false)
 	if err != nil {
-		logger.Fatal().Caller().AnErr("set qos", err).Send()
+		global.Logger.Fatal().Caller().AnErr("set qos", err).Send()
 	}
 	// 注册消费者
 	delivery, err := channel.Consume(
@@ -69,7 +57,7 @@ func (c CalendarConsumer) Start() {
 		nil,
 	)
 	if err != nil {
-		logger.Fatal().Caller().AnErr("consume register", err).Send()
+		global.Logger.Fatal().Caller().AnErr("consume register", err).Send()
 	}
 	// 消费信息，直到退出
 	for {
@@ -77,17 +65,20 @@ func (c CalendarConsumer) Start() {
 		case <-c.quit:
 			return
 		case d := <-delivery:
-			logger.Info().Str("Received a message", string(d.Body)).Send()
+			if d.Body == nil {
+				continue
+			}
+			global.Logger.Info().Str("Received a message", string(d.Body)).Send()
 			// 解析消息
 			var msg CalendarMessage
 			err := json.Unmarshal(d.Body, &msg)
 			if err != nil {
-				logger.Error().Caller().AnErr("unmarshal calendar queue msg", err).Send()
-				_ = d.Reject(true)
+				global.Logger.Error().Caller().AnErr("unmarshal calendar queue msg", err).Send()
+				_ = d.Ack(false)
 				continue
 			}
 			// 开启数据库事务
-			err = tracer.SetSpanToGorm(ctx, global.Engine).Transaction(func(tx *gorm.DB) error {
+			err = global.Engine.Transaction(func(tx *gorm.DB) error {
 				// 获取当前版本章节内容
 				chapter := model.Chapter{ID: msg.ChapterID}
 				err := tx.First(&chapter).Error
@@ -129,7 +120,7 @@ func (c CalendarConsumer) Start() {
 				return nil
 			})
 			if err != nil {
-				logger.Error().Caller().Err(err).Send()
+				global.Logger.Error().Caller().Err(err).Send()
 				_ = d.Reject(true)
 				continue
 			}
@@ -141,46 +132,18 @@ func (c CalendarConsumer) Start() {
 type CalendarProvider struct {
 }
 
-func (c CalendarProvider) Send(msg CalendarMessage) {
+func (c CalendarProvider) Send(msg CalendarMessage, timer *time.Timer) {
 
 	body, _ := json.Marshal(msg)
-
-	global.Logger.Info().Str("calendar mq send", string(body)).Send()
-
-	conn := getConn()
-	channel, err := conn.Channel()
-	if err != nil {
-		global.Logger.Error().Caller().AnErr("open channel", err).Send()
-		return
-	}
-	defer channel.Close()
-
-	queue, err := channel.QueueDeclare(
-		calendarQueueName,
-		true,
-		false,
-		false,
-		false,
-		nil,
-	)
-	if err != nil {
-		global.Logger.Error().Caller().AnErr("queue declare", err).Send()
-		return
-	}
-
-	err = channel.Publish(
-		"",
-		queue.Name,
-		false,
-		false,
-		amqp.Publishing{
-			DeliveryMode: amqp.Persistent,
-			ContentType:  "text/plain",
-			Body:         body,
-		},
-	)
-	if err != nil {
-		global.Logger.Error().Caller().AnErr("publish message", err).Send()
-		return
+	for {
+		select {
+		case <-timer.C:
+			return
+		default:
+			err := SendMessage(registerQueueName, body)
+			if err == nil {
+				return
+			}
+		}
 	}
 }

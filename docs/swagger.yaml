@@ -7,87 +7,19 @@ definitions:
         items:
           type: string
         type: array
+      err:
+        type: error
       msg:
         type: string
     type: object
-  model.Article:
+  service.CalendarResponse:
     properties:
-      chapterNums:
-        example: 100
-        format: int64
-        type: integer
-      chapterRealNums:
-        example: 100
-        format: int64
-        type: integer
-      createdAt:
-        example: "2000-01-01 00:00:00"
-        format: datetime
-        type: string
-      downloadNums:
-        example: 100
-        format: int64
-        type: integer
-      id:
+      day:
         example: 1
-        format: int64
-        type: integer
-      language:
-        example: 1
-        type: integer
-      markId:
-        example: 1
-        format: int64
-        type: integer
-      shareNums:
-        example: 100
-        format: int64
-        type: integer
-      subTitle:
-        example: desc about article
-        type: string
-      talkNums:
-        example: 100
-        format: int64
-        type: integer
-      title:
-        example: article title
-        type: string
-      updatedAt:
-        example: "2000-01-01 00:00:00"
-        format: datetime
-        type: string
-      userId:
-        example: 1
-        format: int64
-        type: integer
-      viewNums:
-        example: 100
-        format: int64
         type: integer
       words:
-        example: 1000
-        format: int64
+        example: 4000
         type: integer
-    type: object
-  model.ArticleSwagger:
-    properties:
-      list:
-        items:
-          $ref: '#/definitions/model.Article'
-        type: array
-      total:
-        type: integer
-    type: object
-  model.Category:
-    properties:
-      id:
-        example: 1
-        format: int64
-        type: integer
-      name:
-        example: category name
-        type: string
     type: object
   service.CategoryRequest:
     properties:
@@ -97,6 +29,556 @@ definitions:
     required:
     - name
     type: object
+  service.CategoryResponse:
+    properties:
+      id:
+        example: 1
+        type: integer
+      name:
+        example: 电影
+        type: string
+      workNum:
+        example: 1
+        type: integer
+    type: object
+  service.ChapterContentResponse:
+    properties:
+      content:
+        example: 正文内容
+        type: string
+      title:
+        example: 第一章 起始
+        type: string
+    type: object
+  service.ChapterHistoryResponse:
+    properties:
+      content:
+        example: 正文内容
+        type: string
+      id:
+        example: 1
+        type: integer
+      title:
+        example: 第一章 起始
+        type: string
+      updatedAt:
+        example: "2020-1-1 00:00:00"
+        type: string
+      version:
+        example: 1
+        type: integer
+    type: object
+  service.ChapterNewRequest:
+    properties:
+      content:
+        type: string
+      subsectionId:
+        type: integer
+      title:
+        type: string
+      workId:
+        type: integer
+    required:
+    - content
+    - subsectionId
+    - title
+    - workId
+    type: object
+  service.ChapterSaveRequest:
+    properties:
+      content:
+        type: string
+      title:
+        type: string
+    required:
+    - content
+    - title
+    type: object
+  service.CollegeCreateRequest:
+    properties:
+      introduce:
+        type: string
+      title:
+        type: string
+    required:
+    - introduce
+    - title
+    type: object
+  service.CollegePageResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/service.CollegeResponse'
+        type: array
+      total:
+        type: integer
+    type: object
+  service.CollegeResponse:
+    properties:
+      id:
+        type: integer
+      introduce:
+        type: string
+      title:
+        type: string
+      worksNums:
+        type: integer
+    type: object
+  service.CollegeUpdateRequest:
+    properties:
+      introduce:
+        type: string
+      title:
+        type: string
+    type: object
+  service.CollegeWorksPageResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/service.WorkResponse'
+        type: array
+      total:
+        type: integer
+    type: object
+  service.CommentPageResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/service.CommentResponse'
+        type: array
+      total:
+        type: integer
+    type: object
+  service.CommentRequest:
+    properties:
+      content:
+        type: string
+      objId:
+        type: integer
+      objType:
+        type: integer
+    required:
+    - content
+    - objId
+    - objType
+    type: object
+  service.CommentResponse:
+    properties:
+      content:
+        type: string
+      id:
+        type: integer
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/service.UserResponse'
+        type: object
+    type: object
+  service.MessagePageResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/service.MessageResponse'
+        type: array
+      total:
+        type: integer
+    type: object
+  service.MessageRequest:
+    properties:
+      content:
+        type: string
+      receiverId:
+        type: integer
+    required:
+    - content
+    - receiverId
+    type: object
+  service.MessageResponse:
+    properties:
+      content:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      readed:
+        type: boolean
+      sender:
+        $ref: '#/definitions/service.UserResponse'
+        type: object
+    type: object
+  service.NewsPageResponse:
+    properties:
+      list:
+        items:
+          properties:
+            commentNums:
+              type: integer
+            description:
+              type: string
+            id:
+              type: integer
+            title:
+              type: string
+            updatedAt:
+              type: string
+          type: object
+        type: array
+      total:
+        type: integer
+    type: object
+  service.NewsRequest:
+    properties:
+      content:
+        type: string
+      title:
+        type: string
+    required:
+    - content
+    - title
+    type: object
+  service.NewsResponse:
+    properties:
+      commentNums:
+        type: integer
+      content:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  service.NewsUpdateRequest:
+    properties:
+      content:
+        type: string
+      title:
+        type: string
+    type: object
+  service.ReplyRequest:
+    properties:
+      commentId:
+        type: integer
+      content:
+        type: string
+    required:
+    - commentId
+    - content
+    type: object
+  service.ReplyResponse:
+    properties:
+      content:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      user:
+        $ref: '#/definitions/service.UserResponse'
+        type: object
+    type: object
+  service.SubscriptionRequest:
+    properties:
+      objId:
+        type: integer
+      objType:
+        type: integer
+    required:
+    - objId
+    - objType
+    type: object
+  service.SubsectionRequest:
+    properties:
+      introduce:
+        type: string
+      name:
+        type: string
+    type: object
+  service.SubsectionResponse:
+    properties:
+      id:
+        type: integer
+      introduce:
+        type: string
+      name:
+        type: string
+      seq:
+        type: integer
+      workNum:
+        type: integer
+    type: object
+  service.TagResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  service.TopicNameResponse:
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+  service.TopicPageResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/service.TopicResponse'
+        type: array
+      total:
+        type: integer
+    type: object
+  service.TopicRequest:
+    properties:
+      categoryId:
+        type: integer
+      description:
+        type: string
+      original:
+        type: string
+      originalUrl:
+        type: string
+      title:
+        type: string
+    required:
+    - categoryId
+    - description
+    - original
+    - originalUrl
+    - title
+    type: object
+  service.TopicResponse:
+    properties:
+      category:
+        $ref: '#/definitions/service.CategoryResponse'
+        type: object
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      original:
+        type: string
+      originalUrl:
+        type: string
+      subscribeNums:
+        type: integer
+      title:
+        type: string
+      updatedAt:
+        type: string
+      workNum:
+        type: integer
+    type: object
+  service.TopicUpdateRequest:
+    properties:
+      categoryId:
+        type: integer
+      description:
+        type: string
+      original:
+        type: string
+      originalUrl:
+        type: string
+      title:
+        type: string
+    type: object
+  service.UserCreateRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  service.UserLoginRequest:
+    properties:
+      password:
+        type: string
+      rememberMe:
+        type: boolean
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  service.UserResponse:
+    properties:
+      avatar:
+        type: string
+      createdAt:
+        type: string
+      email:
+        type: string
+      fansNums:
+        type: integer
+      gender:
+        type: integer
+      id:
+        type: integer
+      introduce:
+        type: string
+      root:
+        type: boolean
+      username:
+        type: string
+      words:
+        type: integer
+      workDay:
+        type: integer
+      worksNums:
+        type: integer
+    type: object
+  service.UserSettingRequest:
+    properties:
+      commentEmail:
+        type: boolean
+      disableSearch:
+        type: boolean
+      hiddenGrade:
+        type: boolean
+      hiddenTag:
+        type: boolean
+      showAdult:
+        type: boolean
+      showEmail:
+        type: boolean
+      subscriptionEmail:
+        type: boolean
+      systemEmail:
+        type: boolean
+      topicEmail:
+        type: boolean
+    required:
+    - commentEmail
+    - disableSearch
+    - hiddenGrade
+    - hiddenTag
+    - showAdult
+    - showEmail
+    - subscriptionEmail
+    - systemEmail
+    - topicEmail
+    type: object
+  service.UserSettingResponse:
+    properties:
+      commentEmail:
+        type: boolean
+      disableSearch:
+        type: boolean
+      hiddenGrade:
+        type: boolean
+      hiddenTag:
+        type: boolean
+      showAdult:
+        type: boolean
+      showEmail:
+        type: boolean
+      subscriptionEmail:
+        type: boolean
+      systemEmail:
+        type: boolean
+      topicEmail:
+        type: boolean
+    required:
+    - commentEmail
+    - disableSearch
+    - hiddenGrade
+    - hiddenTag
+    - showAdult
+    - showEmail
+    - subscriptionEmail
+    - systemEmail
+    - topicEmail
+    type: object
+  service.UserUpdateEmailRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  service.UserUpdatePassRequest:
+    properties:
+      oldPassword:
+        type: string
+      password:
+        type: string
+    required:
+    - oldPassword
+    - password
+    type: object
+  service.UserUpdateRequest:
+    properties:
+      avatar:
+        type: string
+      gender:
+        type: integer
+      introduce:
+        type: string
+      username:
+        type: string
+    type: object
+  service.WorkResponse:
+    properties:
+      category:
+        $ref: '#/definitions/service.CategoryResponse'
+        type: object
+      chapterNums:
+        type: integer
+      collegeNums:
+        type: integer
+      createdAt:
+        type: string
+      draftNums:
+        type: integer
+      id:
+        type: integer
+      introduce:
+        type: string
+      recycleNums:
+        type: integer
+      subscribeNums:
+        type: integer
+      subsectionNums:
+        type: integer
+      tags:
+        items:
+          $ref: '#/definitions/service.TagResponse'
+        type: array
+      talkNums:
+        type: integer
+      title:
+        type: string
+      topic:
+        $ref: '#/definitions/service.TopicNameResponse'
+        type: object
+      type:
+        type: integer
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/service.UserResponse'
+        type: object
+      viewNums:
+        type: integer
+      words:
+        type: integer
+    type: object
 info:
   contact: {}
   description: 属于国内的同人圈
@@ -105,99 +587,22 @@ info:
   title: 同人圈
   version: "1.0"
 paths:
-  /api/v1/articles:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: 查询内容
-        in: query
-        maxLength: 100
-        name: query
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 成功
-          schema:
-            $ref: '#/definitions/model.ArticleSwagger'
-        "400":
-          description: 请求错误
-          schema:
-            $ref: '#/definitions/errcode.Error'
-        "500":
-          description: 内部错误
-          schema:
-            $ref: '#/definitions/errcode.Error'
-      summary: 获取文章列表
-      tags:
-      - 文章
+  /api/v1/admin/category:
     post:
       consumes:
       - application/json
       parameters:
-      - description: 标题
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 分类
         in: body
-        maxLength: 100
-        name: title
+        name: category
         required: true
         schema:
-          type: string
-      - description: 简述
-        in: body
-        maxLength: 100
-        name: subTitle
-        required: true
-        schema:
-          type: string
-      - description: 书签ID
-        in: body
-        name: markID
-        schema:
-          type: integer
-      - default: 1
-        description: 语言
-        enum:
-        - 1
-        - 2
-        in: body
-        name: language
-        required: true
-        schema:
-          type: integer
-      - description: 计划章节数
-        in: body
-        name: chapterNums
-        schema:
-          type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 成功
-          schema:
-            $ref: '#/definitions/model.Article'
-        "400":
-          description: 请求错误
-          schema:
-            $ref: '#/definitions/errcode.Error'
-        "500":
-          description: 内部错误
-          schema:
-            $ref: '#/definitions/errcode.Error'
-      summary: 创建文章
-      tags:
-      - 文章
-  /api/v1/articles/{id}:
-    delete:
-      parameters:
-      - description: 文章ID
-        in: path
-        name: id
-        required: true
-        type: integer
+          $ref: '#/definitions/service.CategoryRequest'
       produces:
       - application/json
       responses:
@@ -213,154 +618,19 @@ paths:
           description: 内部错误
           schema:
             $ref: '#/definitions/errcode.Error'
-      summary: 删除文章
-      tags:
-      - 文章
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: 文章ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 成功
-          schema:
-            $ref: '#/definitions/model.Article'
-        "400":
-          description: 请求错误
-          schema:
-            $ref: '#/definitions/errcode.Error'
-        "500":
-          description: 内部错误
-          schema:
-            $ref: '#/definitions/errcode.Error'
-      summary: 获取文章信息
-      tags:
-      - 文章
-    put:
-      consumes:
-      - application/json
-      parameters:
-      - description: 文章ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: 标题
-        in: body
-        maxLength: 100
-        name: title
-        required: true
-        schema:
-          type: string
-      - description: 简述
-        in: body
-        maxLength: 100
-        name: subTitle
-        required: true
-        schema:
-          type: string
-      - description: 书签ID
-        in: body
-        name: markID
-        schema:
-          type: integer
-      - default: 1
-        description: 语言
-        enum:
-        - 1
-        - 2
-        in: body
-        name: language
-        required: true
-        schema:
-          type: integer
-      - description: 计划章节数
-        in: body
-        name: chapterNums
-        schema:
-          type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 成功
-          schema:
-            $ref: '#/definitions/model.Article'
-        "400":
-          description: 请求错误
-          schema:
-            $ref: '#/definitions/errcode.Error'
-        "500":
-          description: 内部错误
-          schema:
-            $ref: '#/definitions/errcode.Error'
-      summary: 修改文章信息
-      tags:
-      - 文章
-  /api/v1/category:
-    get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 成功
-          schema:
-            items:
-              $ref: '#/definitions/model.Category'
-            type: array
-        "400":
-          description: 请求错误
-          schema:
-            $ref: '#/definitions/errcode.Error'
-        "500":
-          description: 内部错误
-          schema:
-            $ref: '#/definitions/errcode.Error'
-      summary: 获取所有分类
-      tags:
-      - 分类
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: 分类
-        in: body
-        name: category
-        required: true
-        schema:
-          $ref: '#/definitions/service.CategoryRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 成功
-          schema:
-            $ref: '#/definitions/model.Category'
-        "400":
-          description: 请求错误
-          schema:
-            $ref: '#/definitions/errcode.Error'
-        "500":
-          description: 内部错误
-          schema:
-            $ref: '#/definitions/errcode.Error'
       summary: 创建分类
       tags:
       - 分类
-  /api/v1/category/{id}:
+  /api/v1/admin/category/{id}:
     delete:
       consumes:
       - application/json
       parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: 分类ID
         in: path
         name: id
@@ -388,6 +658,11 @@ paths:
       consumes:
       - application/json
       parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: 分类ID
         in: path
         name: id
@@ -405,7 +680,7 @@ paths:
         "200":
           description: 成功
           schema:
-            $ref: '#/definitions/model.Category'
+            type: string
         "400":
           description: 请求错误
           schema:
@@ -414,17 +689,22 @@ paths:
           description: 内部错误
           schema:
             $ref: '#/definitions/errcode.Error'
-      summary: 修改分类
+      summary: 修改指定分类信息
       tags:
       - 分类
-  /auth:
+  /api/v1/calendar:
     get:
       consumes:
       - application/json
       parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: 用户ID
         in: path
-        name: id
+        name: userID
         required: true
         type: integer
       - description: 年份
@@ -445,6 +725,72 @@ paths:
         "200":
           description: 成功
           schema:
+            items:
+              $ref: '#/definitions/service.CalendarResponse'
+            type: array
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 获取指定用户的创作日历
+      tags:
+      - 创作日历
+  /api/v1/category:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            items:
+              $ref: '#/definitions/service.CategoryResponse'
+            type: array
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 获取所有分类
+      tags:
+      - 分类
+  /api/v1/chapter:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.ChapterNewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
             type: string
         "400":
           description: 请求错误
@@ -454,7 +800,1784 @@ paths:
           description: 内部错误
           schema:
             $ref: '#/definitions/errcode.Error'
-      summary: 获取创作日历
+      summary: 新建草稿章节
       tags:
-      - Calendar
+      - 章节
+  /api/v1/chapter/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 章节ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 删除章节
+      tags:
+      - 章节
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 章节ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/service.ChapterContentResponse'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 查询章节内容
+      tags:
+      - 章节
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 章节ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.ChapterSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 保存章节内容
+      tags:
+      - 章节
+  /api/v1/chapter/{id}/{subsectionID}:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 章节ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 分卷ID
+        in: path
+        name: subsectionID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 修改章节分卷信息
+      tags:
+      - 章节
+  /api/v1/chapter/{id}/history:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 章节ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            items:
+              $ref: '#/definitions/service.ChapterHistoryResponse'
+            type: array
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 查询章节历史版本
+      tags:
+      - 章节
+  /api/v1/chapter/{id}/lock:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 章节ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 锁住章节
+      tags:
+      - 章节
+  /api/v1/chapter/{id}/publish:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 章节ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 回收章节
+      tags:
+      - 章节
+  /api/v1/chapter/{id}/unlock:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 章节ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 解锁章节
+      tags:
+      - 章节
+  /api/v1/college:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 页大小
+        in: query
+        name: pageSize
+        type: integer
+      - description: 当前页
+        in: query
+        name: page
+        type: integer
+      - description: 用户ID
+        in: query
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/service.CollegePageResponse'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 查询书单列表
+      tags:
+      - 书单
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.CollegeCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 创建书单
+      tags:
+      - 书单
+  /api/v1/college/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 书单ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 删除
+      tags:
+      - 书单
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 书单ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.CollegeUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 修改书单信息
+      tags:
+      - 书单
+  /api/v1/college/{id}/add/{workId}:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 书单ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 作品ID
+        in: path
+        name: workId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 添加作品
+      tags:
+      - Chapter
+  /api/v1/college/{id}/works:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 书单ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 页大小
+        in: query
+        name: pageSize
+        type: integer
+      - description: 当前页
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/service.CollegeWorksPageResponse'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 获取书单内作品列表
+      tags:
+      - 书单
+  /api/v1/comment:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 请求参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/service.CommentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 添加评论
+      tags:
+      - 评论
+  /api/v1/comment/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 评论ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 删除评论
+      tags:
+      - 评论
+  /api/v1/comment/{objType}/{objID}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 评论对象类型,0-作品,1-章节,2-选段,3-公告
+        enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        in: path
+        name: objType
+        required: true
+        type: integer
+      - description: 评论对象ID
+        in: path
+        name: objID
+        required: true
+        type: integer
+      - description: 页大小
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      - description: 当前页
+        in: query
+        name: page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/service.CommentPageResponse'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 获取评论列表
+      tags:
+      - 评论
+  /api/v1/currentUser:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/service.UserResponse'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 当前用户信息
+      tags:
+      - 用户
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.UserUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 修改用户信息
+      tags:
+      - 用户
+  /api/v1/currentUser/email:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.UserUpdateEmailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 修改用户邮箱
+      tags:
+      - 用户
+  /api/v1/currentUser/password:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.UserUpdatePassRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 修改用户密码
+      tags:
+      - 用户
+  /api/v1/currentUser/setting:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/service.UserSettingResponse'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 当前用户偏好设置
+      tags:
+      - 用户
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.UserSettingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 修改用户偏好设置
+      tags:
+      - 用户
+  /api/v1/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.UserLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 登录
+      tags:
+      - 用户
+  /api/v1/logout:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 退出登录
+      tags:
+      - 用户
+  /api/v1/message:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.MessageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 发送私信
+      tags:
+      - 私信
+  /api/v1/message/{type}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 私信类型
+        enum:
+        - 0
+        - 1
+        in: path
+        name: type
+        required: true
+        type: integer
+      - description: 页大小
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      - description: 当前页
+        in: query
+        name: page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/service.MessagePageResponse'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 查看私信
+      tags:
+      - 私信
+  /api/v1/message/unread:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: int
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 未读私信数
+      tags:
+      - 私信
+  /api/v1/news:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 请求参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.NewsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 添加公告
+      tags:
+      - 公告
+  /api/v1/news/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 公告ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 删除公告
+      tags:
+      - 公告
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 公告ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/service.NewsResponse'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 公告内容
+      tags:
+      - 公告
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 公告ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 请求参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.NewsUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 修改公告
+      tags:
+      - 公告
+  /api/v1/news/list:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 页大小
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      - description: 当前页
+        in: query
+        name: page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/service.NewsPageResponse'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 公告列表
+      tags:
+      - 公告
+  /api/v1/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 注册邮箱
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 注册
+      tags:
+      - 用户
+  /api/v1/register/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.UserCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 创建用户
+      tags:
+      - 用户
+  /api/v1/register/identify:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 注册路径
+        in: query
+        name: path
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 邮箱
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 验证注册邮箱
+      tags:
+      - 用户
+  /api/v1/reply:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 请求参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.ReplyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 添加回复
+      tags:
+      - 回复
+  /api/v1/reply/{commentID}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 评论ID
+        in: path
+        name: commentID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            items:
+              $ref: '#/definitions/service.ReplyResponse'
+            type: array
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 回复列表
+      tags:
+      - 回复
+  /api/v1/reply/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 回复ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 回复列表
+      tags:
+      - 回复
+  /api/v1/subscription:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 请求参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.SubscriptionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 添加订阅
+      tags:
+      - 订阅
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 请求参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.SubscriptionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 添加订阅
+      tags:
+      - 订阅
+  /api/v1/subsection:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 请求参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.SubsectionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 分卷列表
+      tags:
+      - 分卷
+  /api/v1/subsection/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 分卷ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 分卷列表
+      tags:
+      - 分卷
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 分卷ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 请求参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.SubsectionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 分卷列表
+      tags:
+      - 分卷
+  /api/v1/subsection/{workID}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 作品ID
+        in: path
+        name: workID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            items:
+              $ref: '#/definitions/service.SubsectionResponse'
+            type: array
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 分卷列表
+      tags:
+      - 分卷
+  /api/v1/tag/{name}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 标签名
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            items:
+              type: string
+            type: array
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 查询匹配标签
+      tags:
+      - 标签
+  /api/v1/topic:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 页大小
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      - description: 当前页
+        in: query
+        name: page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/service.TopicPageResponse'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 专题列表
+      tags:
+      - 专题
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 请求参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.TopicRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 创建专题
+      tags:
+      - 专题
+  /api/v1/topic/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 专题ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 修改专题
+      tags:
+      - 专题
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 专题ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 请求参数
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/service.TopicUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 修改专题
+      tags:
+      - 专题
+  /api/v1/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 上传图片
+      parameters:
+      - description: 文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 上传图片
+      tags:
+      - 文件
+  /api/v1/user/{id}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 用户ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/service.UserResponse'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 用户信息
+      tags:
+      - 用户
 swagger: "2.0"

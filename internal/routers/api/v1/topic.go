@@ -17,9 +17,10 @@ func (t Topic) Router(api gin.IRouter) {
 }
 
 // @Summary 专题列表
-// @Tags Topic
+// @Tags 专题
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param pageSize query int true "页大小"
 // @Param page query int true "当前页"
 // @Success 200 {object} service.TopicPageResponse "成功"
@@ -31,10 +32,11 @@ func (t Topic) List(ctx *gin.Context) {
 }
 
 // @Summary 创建专题
-// @Tags Topic
+// @Tags 专题
 // @Accept json
 // @Produce json
-// @Param param body service.TopicRequest
+// @Param Authorization header string true "token"
+// @Param param body service.TopicRequest true "请求参数"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
@@ -44,11 +46,12 @@ func (t Topic) Create(ctx *gin.Context) {
 }
 
 // @Summary 修改专题
-// @Tags Topic
+// @Tags 专题
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "专题ID"
-// @Param param body service.TopicUpdateRequest
+// @Param param body service.TopicUpdateRequest true "请求参数"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
@@ -58,9 +61,10 @@ func (t Topic) Update(ctx *gin.Context) {
 }
 
 // @Summary 修改专题
-// @Tags Topic
+// @Tags 专题
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "专题ID"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"

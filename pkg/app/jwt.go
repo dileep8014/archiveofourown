@@ -17,9 +17,8 @@ func GetJwtSecret() []byte {
 	return []byte(global.JWTSetting.Secret)
 }
 
-func GenerateToken(id int64, username string, root bool) (string, error) {
-	now := time.Now()
-	expireTime := now.Add(time.Duration(global.JWTSetting.Expire) * time.Second)
+func GenerateToken(id int64, username string, root bool, expire time.Duration) (string, error) {
+	expireTime := time.Now().Add(expire)
 	claims := Claims{
 		ID:       id,
 		Username: username,
@@ -32,14 +31,14 @@ func GenerateToken(id int64, username string, root bool) (string, error) {
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(GetJwtSecret())
 }
 
-func ParseToken(token string) (*Claims, error) {
+func ParseToken(token string) (Claims, error) {
 	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(*jwt.Token) (interface{}, error) {
 		return GetJwtSecret(), nil
 	})
 	if tokenClaims != nil {
 		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
-			return claims, nil
+			return *claims, nil
 		}
 	}
-	return nil, err
+	return Claims{}, err
 }

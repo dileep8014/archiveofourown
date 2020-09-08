@@ -2,9 +2,9 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"github.com/shyptr/archiveofourown/global"
-	"github.com/shyptr/archiveofourown/pkg/tracer"
-	"gorm.io/gorm"
+	"github.com/shyptr/archiveofourown/pkg/gormplugins"
 )
 
 type Service struct {
@@ -13,5 +13,10 @@ type Service struct {
 }
 
 func NewService(c *gin.Context) *Service {
-	return &Service{ctx: c, db: tracer.SetSpanToGorm(c, global.Engine)}
+	db := gormplugins.SetSpanToGorm(c.Request.Context(), global.Engine)
+	name, exists := c.Get("me.name")
+	if exists {
+		db.Set("me.name", name)
+	}
+	return &Service{ctx: c, db: db}
 }

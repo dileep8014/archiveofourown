@@ -16,10 +16,11 @@ func (n News) Router(api gin.IRouter) {
 }
 
 // @Summary 添加公告
-// @Tags News
+// @Tags 公告
 // @Accept json
 // @Produce json
-// @Param param body service.NewsRequest
+// @Param Authorization header string true "token"
+// @Param param body service.NewsRequest true "请求参数"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
@@ -29,11 +30,12 @@ func (n News) Create(ctx *gin.Context) {
 }
 
 // @Summary 修改公告
-// @Tags News
+// @Tags 公告
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "公告ID"
-// @Param param body service.NewsUpdateRequest
+// @Param param body service.NewsUpdateRequest true "请求参数"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
@@ -43,9 +45,10 @@ func (n News) Update(ctx *gin.Context) {
 }
 
 // @Summary 删除公告
-// @Tags News
+// @Tags 公告
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "公告ID"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"

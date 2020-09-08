@@ -9,7 +9,10 @@ type User struct {
 	Username  string
 	Email     string
 	Password  string
+	Avatar    string
+	Gender    int
 	Root      bool
+	Introduce string
 	CreatedBy string
 	UpdatedBy string
 	CreatedAt time.Time
@@ -34,4 +37,25 @@ type UserEx struct {
 
 func (ex UserEx) TableName() string {
 	return "user_ex"
+}
+
+type UserSt struct {
+	UserId            int64
+	ShowEmail         bool
+	DisableSearch     bool
+	ShowAdult         bool
+	HiddenGrade       bool
+	HiddenTag         bool
+	SubscriptionEmail bool
+	TopicEmail        bool
+	CommentEmail      bool
+	SystemEmail       bool
+	CreatedBy         string
+	UpdatedBy         string
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
+}
+
+func (u UserSt) TableName() string {
+	return "user_st"
 }

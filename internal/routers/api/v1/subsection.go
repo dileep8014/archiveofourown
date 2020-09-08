@@ -17,9 +17,10 @@ func (s Subsection) Router(api gin.IRouter) {
 }
 
 // @Summary 分卷列表
-// @Tags Subsection
+// @Tags 分卷
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param workID path int true "作品ID"
 // @Success 200 {array} service.SubsectionResponse "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
@@ -30,10 +31,11 @@ func (s Subsection) List(ctx *gin.Context) {
 }
 
 // @Summary 分卷列表
-// @Tags Subsection
+// @Tags 分卷
 // @Accept json
 // @Produce json
-// @Param param body service.SubsectionRequest
+// @Param Authorization header string true "token"
+// @Param param body service.SubsectionRequest true "请求参数"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
@@ -43,11 +45,12 @@ func (s Subsection) Create(ctx *gin.Context) {
 }
 
 // @Summary 分卷列表
-// @Tags Subsection
+// @Tags 分卷
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "分卷ID"
-// @Param param body service.SubsectionRequest
+// @Param param body service.SubsectionRequest true "请求参数"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
@@ -57,9 +60,10 @@ func (s Subsection) Update(ctx *gin.Context) {
 }
 
 // @Summary 分卷列表
-// @Tags Subsection
+// @Tags 分卷
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "分卷ID"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"

@@ -18,20 +18,21 @@ func NewChapter() Chapter {
 	return Chapter{}
 }
 
-func (c Chapter) ChapterOwner(param string, ctx *gin.Context) (int64, error) {
-	id, err := app.ShouldParamConvertInt(ctx, param)
+func (c Chapter) ChapterOwner(ctx *gin.Context) (bool, error) {
+	id, err := app.ShouldParamConvertInt(ctx, "id")
 	if err != nil {
-		return 0, err
+		return false, errcode.InValidParams.WithDetails(err.Error())
 	}
+	ctx.Set("id", int64(id))
 	chapter := model.Chapter{ID: int64(id)}
 	var res int64
 	err = global.Engine.Model(&chapter).Joins("right join work on work.id=chapter.work_id").
 		Select("work.user_id").Where("chapter.id=?", chapter.ID).First(&res).Error
-	return res, err
+	return res == ctx.GetInt64("me.id"), err
 }
 
 func (c Chapter) Router(api gin.IRouter) {
-	owner := middleware.Verify(middleware.ResourceOwner("id", c.ChapterOwner))
+	owner := middleware.Verify(middleware.LoginNeed, c.ChapterOwner)
 	// 获取具体章节内容
 	api.GET("/chapter/:id", c.Get)
 	// 章节历史发布版本
@@ -51,9 +52,10 @@ func (c Chapter) Router(api gin.IRouter) {
 }
 
 // @Summary 查询章节内容
-// @Tags Chapter
+// @Tags 章节
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "章节ID"
 // @Success 200 {object} service.ChapterContentResponse "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
@@ -61,30 +63,25 @@ func (c Chapter) Router(api gin.IRouter) {
 // @Router /api/v1/chapter/{id} [get]
 func (c Chapter) Get(ctx *gin.Context) {
 	res := app.NewResponse(ctx)
-	id, err := app.ShouldParamConvertInt(ctx, "id")
-	if err != nil {
-		res.ToErrorResponse(errcode.InValidParams.WithDetails(err.Error()))
-		return
-	}
-
 	svc := service.NewService(ctx)
 
-	chapter, err := svc.GetChapter(int64(id))
+	chapter, err := svc.GetChapter(ctx.GetInt64("id"))
 	if err != nil && err == service.ChapterLockError {
 		res.ToErrorResponse(errcode.ErrorGetChapter.WithDetails(err.Error()))
 		return
 	}
 	if err != nil {
-		res.ToErrorResponse(errcode.ErrorGetChapter.WithError(err))
+		res.CheckErrorAndResponse(err, errcode.ErrorGetChapter)
 		return
 	}
 	res.ToResponse(chapter)
 }
 
 // @Summary 查询章节历史版本
-// @Tags Chapter
+// @Tags 章节
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "章节ID"
 // @Success 200 {array} service.ChapterHistoryResponse "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
@@ -92,26 +89,21 @@ func (c Chapter) Get(ctx *gin.Context) {
 // @Router /api/v1/chapter/{id}/history [get]
 func (c Chapter) History(ctx *gin.Context) {
 	res := app.NewResponse(ctx)
-	id, err := app.ShouldParamConvertInt(ctx, "id")
-	if err != nil {
-		res.ToErrorResponse(errcode.InValidParams.WithDetails(err.Error()))
-		return
-	}
-
 	svc := service.NewService(ctx)
 
-	list, err := svc.GetHistoryChapter(int64(id))
+	list, err := svc.GetHistoryChapter(ctx.GetInt64("id"))
 	if err != nil {
-		res.ToErrorResponse(errcode.ErrorGetHistoryChapter.WithError(err))
+		res.CheckErrorAndResponse(err, errcode.ErrorGetHistoryChapter)
 		return
 	}
 	res.ToResponse(list)
 }
 
 // @Summary 新建草稿章节
-// @Tags Chapter
+// @Tags 章节
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param param body service.ChapterNewRequest true "参数"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
@@ -121,7 +113,7 @@ func (c Chapter) New(ctx *gin.Context) {
 	res := app.NewResponse(ctx)
 	req := service.ChapterNewRequest{}
 	valid, errs := app.BindAndValid(ctx, &req, ctx.BindJSON)
-	if valid {
+	if !valid {
 		res.ToErrorResponse(errcode.InValidParams.WithDetails(errs.Errors()...))
 		return
 	}
@@ -130,16 +122,17 @@ func (c Chapter) New(ctx *gin.Context) {
 
 	err := svc.NewChapter(req)
 	if err != nil {
-		res.ToErrorResponse(errcode.ErrorNewChapter.WithError(err))
+		res.CheckErrorAndResponse(err, errcode.ErrorNewChapter)
 		return
 	}
 	res.ToResponse(gin.H{})
 }
 
 // @Summary 保存章节内容
-// @Tags Chapter
+// @Tags 章节
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "章节ID"
 // @Param param body service.ChapterSaveRequest true "参数"
 // @Success 200 {string} string "成功"
@@ -148,32 +141,28 @@ func (c Chapter) New(ctx *gin.Context) {
 // @Router /api/v1/chapter/{id} [post]
 func (c Chapter) Save(ctx *gin.Context) {
 	res := app.NewResponse(ctx)
-	id, err := app.ShouldParamConvertInt(ctx, "id")
-	if err != nil {
-		res.ToErrorResponse(errcode.InValidParams.WithDetails(err.Error()))
-		return
-	}
 	req := service.ChapterSaveRequest{}
 	valid, errs := app.BindAndValid(ctx, &req, ctx.BindJSON)
-	if valid {
+	if !valid {
 		res.ToErrorResponse(errcode.InValidParams.WithDetails(errs.Errors()...))
 		return
 	}
 
 	svc := service.NewService(ctx)
 
-	err = svc.SaveChapter(int64(id), req)
+	err := svc.SaveChapter(ctx.GetInt64("id"), req)
 	if err != nil {
-		res.ToErrorResponse(errcode.ErrorSaveChapter.WithError(err))
+		res.CheckErrorAndResponse(err, errcode.ErrorSaveChapter)
 		return
 	}
 	res.ToResponse(gin.H{})
 }
 
 // @Summary 发布章节
-// @Tags Chapter
+// @Tags 章节
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "章节ID"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
@@ -181,26 +170,21 @@ func (c Chapter) Save(ctx *gin.Context) {
 // @Router /api/v1/chapter/{id}/publish [post]
 func (c Chapter) Publish(ctx *gin.Context) {
 	res := app.NewResponse(ctx)
-	id, err := app.ShouldParamConvertInt(ctx, "id")
-	if err != nil {
-		res.ToErrorResponse(errcode.InValidParams.WithDetails(err.Error()))
-		return
-	}
-
 	svc := service.NewService(ctx)
 
-	err = svc.PublishChapter(int64(id))
+	err := svc.PublishChapter(ctx.GetInt64("id"))
 	if err != nil {
-		res.ToErrorResponse(errcode.ErrorPublishChapter.WithError(err))
+		res.CheckErrorAndResponse(err, errcode.ErrorPublishChapter)
 		return
 	}
 	res.ToResponse(gin.H{})
 }
 
 // @Summary 回收章节
-// @Tags Chapter
+// @Tags 章节
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "章节ID"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
@@ -208,26 +192,21 @@ func (c Chapter) Publish(ctx *gin.Context) {
 // @Router /api/v1/chapter/{id}/publish [post]
 func (c Chapter) Recycle(ctx *gin.Context) {
 	res := app.NewResponse(ctx)
-	id, err := app.ShouldParamConvertInt(ctx, "id")
-	if err != nil {
-		res.ToErrorResponse(errcode.InValidParams.WithDetails(err.Error()))
-		return
-	}
-
 	svc := service.NewService(ctx)
 
-	err = svc.RecycleChapter(int64(id))
+	err := svc.RecycleChapter(ctx.GetInt64("id"))
 	if err != nil {
-		res.ToErrorResponse(errcode.ErrorPublishChapter.WithError(err))
+		res.CheckErrorAndResponse(err, errcode.ErrorPublishChapter)
 		return
 	}
 	res.ToResponse(gin.H{})
 }
 
 // @Summary 修改章节分卷信息
-// @Tags Chapter
+// @Tags 章节
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "章节ID"
 // @Param subsectionID path int true "分卷ID"
 // @Success 200 {string} string "成功"
@@ -238,7 +217,7 @@ func (c Chapter) Update(ctx *gin.Context) {
 	res := app.NewResponse(ctx)
 	req := service.ChapterPathRequest{}
 	valid, errs := app.BindAndValid(ctx, &req, ctx.BindUri)
-	if valid {
+	if !valid {
 		res.ToErrorResponse(errcode.InValidParams.WithDetails(errs.Errors()...))
 		return
 	}
@@ -247,16 +226,17 @@ func (c Chapter) Update(ctx *gin.Context) {
 
 	err := svc.UpdateChapterSubsection(req)
 	if err != nil {
-		res.ToErrorResponse(errcode.ErrorUpdateChapter.WithError(err))
+		res.CheckErrorAndResponse(err, errcode.ErrorUpdateChapter)
 		return
 	}
 	res.ToResponse(gin.H{})
 }
 
 // @Summary 删除章节
-// @Tags Chapter
+// @Tags 章节
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "章节ID"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
@@ -264,17 +244,11 @@ func (c Chapter) Update(ctx *gin.Context) {
 // @Router /api/v1/chapter/{id} [delete]
 func (c Chapter) Delete(ctx *gin.Context) {
 	res := app.NewResponse(ctx)
-	id, err := app.ShouldParamConvertInt(ctx, "id")
-	if err != nil {
-		res.ToErrorResponse(errcode.InValidParams.WithDetails(err.Error()))
-		return
-	}
-
 	svc := service.NewService(ctx)
 
-	err = svc.DeleteChapter(int64(id))
+	err := svc.DeleteChapter(ctx.GetInt64("id"))
 	if err != nil {
-		res.ToErrorResponse(errcode.ErrorDeleteChapter.WithError(err))
+		res.CheckErrorAndResponse(err, errcode.ErrorDeleteChapter)
 		return
 	}
 	res.ToResponse(gin.H{})

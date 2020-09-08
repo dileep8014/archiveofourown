@@ -8,8 +8,8 @@ import (
 
 func Root() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		root := c.Value("me.root").(bool)
-		if !root {
+		root, ok := c.Get("me.root")
+		if !ok || !root.(bool) {
 			res := app.NewResponse(c)
 			res.ToErrorResponse(errcode.ErrorPermission.WithDetails("非管理员用户"))
 			c.Abort()

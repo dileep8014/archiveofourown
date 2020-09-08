@@ -14,9 +14,10 @@ func (t Tag) Router(api gin.IRouter) {
 }
 
 // @Summary 查询匹配标签
-// @Tags Tag
+// @Tags 标签
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param name path string true "标签名"
 // @Success 200 {array} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"

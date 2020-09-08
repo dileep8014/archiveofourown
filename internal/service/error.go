@@ -2,7 +2,8 @@ package service
 
 import (
 	"errors"
-	"gorm.io/gorm"
+	"github.com/jinzhu/gorm"
+	"github.com/shyptr/archiveofourown/pkg/errcode"
 )
 
 var (
@@ -24,7 +25,7 @@ var opErrs = []error{InsertError, UpdateError, DeleteError}
 
 func CheckError(result *gorm.DB, op GormOperator) error {
 	if result.Error == gorm.ErrRecordNotFound {
-		return nil
+		return errcode.NotFound
 	}
 	if result.Error != nil {
 		return result.Error

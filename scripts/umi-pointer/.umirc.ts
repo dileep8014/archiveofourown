@@ -9,6 +9,7 @@ export default defineConfig({
     baseNavigator: true,
     baseSeparator: '-',
   },
+  mock: false,
   styles: ['./src/app.css'],
   layout: {
     'navTheme': 'light',
@@ -63,6 +64,13 @@ export default defineConfig({
       component: '@/pages/work/write/index',
       layout: { hideNav: true, hideMenu: true },
       wrappers: ['@/component/wrapper/auth'],
+    },
+    {
+      exact: true,
+      path: '/register/:path',
+      title: '注册信息',
+      component: '@/pages/register/index',
+      wrappers: ['@/component/wrapper/notAuth'],
     },
     {
       menu: { name: '同人圈' }, routes: [

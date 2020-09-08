@@ -158,6 +158,9 @@ create table `user`
     id         int(10)      not null unique auto_increment comment 'ID',
     username   varchar(100) not null unique comment '用户名',
     email      varchar(100) not null unique comment '邮箱',
+    avatar     varchar(200) not null default '' comment '头像地址',
+    gender     tinyint(1)   not null default 0 comment '性别:(0-保密,1-男,2-女)',
+    introduce  varchar(200) not null default '' comment '个人简介',
     password   varchar(200) not null comment '密码',
     root       bool         not null default false comment '是否管理员',
     created_at datetime     not null default current_timestamp comment '创建时间',
@@ -167,8 +170,6 @@ create table `user`
     PRIMARY KEY (id)
 ) engine = InnoDB comment = '用户表';
 
-insert into `user`(username, email, password, root)
-    value ('shyptr', 'shyptr14@gmial.com', '$2a$10$LNXhKGnLdjKZ2Kvd.l99KOaoI31dMchuoSbI7rFgYGCm.ofUwFc8C', true);
 
 # 用户扩展表
 drop table if exists `user_ex`;
@@ -186,12 +187,34 @@ create table `user_ex`
     PRIMARY KEY (user_id)
 ) engine = InnoDB comment = '用户表';
 
+# 用户设置表
+drop table if exists `user_st`;
+create table `user_st`
+(
+    user_id            int(10)      not null unique comment '用户ID',
+    show_email         boolean      not null comment '展示邮件',
+    disable_search     boolean      not null comment '禁止搜索我',
+    show_adult         boolean      not null comment '显示成人内容',
+    hidden_grade       boolean      not null comment '隐藏作品分级信息',
+    hidden_tag         boolean      not null comment '隐藏作品标签信息',
+    subscription_email boolean      not null comment '订阅邮件提醒',
+    topic_email        boolean      not null comment '专题邮件提醒',
+    comment_email      boolean      not null comment '评论邮件提醒',
+    system_email       boolean      not null comment '系统消息邮件提醒',
+    created_at         datetime     not null default current_timestamp comment '创建时间',
+    created_by         varchar(100) not null default 'root' comment '创建人',
+    updated_at         datetime     not null default current_timestamp comment '修改时间',
+    updated_by         varchar(100) not null default 'root' comment '修改人',
+    PRIMARY KEY (user_id)
+) engine = InnoDB comment ='用户设置表';
+
 # 待认证用户表
 drop table if exists `identify`;
 create table `identify`
 (
     id         int(10)      not null unique auto_increment comment 'ID',
     email      varchar(100) not null unique comment '邮箱',
+    path       varchar(200) not null unique comment '路径',
     created_at datetime     not null default current_timestamp comment '创建时间',
     created_by varchar(100) not null default 'root' comment '创建人',
     primary key (id)

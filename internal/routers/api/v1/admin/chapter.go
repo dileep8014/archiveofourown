@@ -20,9 +20,10 @@ func (c Chapter) Router(api gin.IRouter) {
 }
 
 // @Summary 锁住章节
-// @Tags Chapter
+// @Tags 章节
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "章节ID"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
@@ -40,16 +41,17 @@ func (c Chapter) Lock(ctx *gin.Context) {
 
 	err = svc.LockChapter(int64(id))
 	if err != nil {
-		res.ToErrorResponse(errcode.ErrorLockChapter.WithError(err))
+		res.CheckErrorAndResponse(err, errcode.ErrorLockChapter)
 		return
 	}
 	res.ToResponse(gin.H{})
 }
 
 // @Summary 解锁章节
-// @Tags Chapter
+// @Tags 章节
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param id path int true "章节ID"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
@@ -67,7 +69,7 @@ func (c Chapter) UnLock(ctx *gin.Context) {
 
 	err = svc.UnLockChapter(int64(id))
 	if err != nil {
-		res.ToErrorResponse(errcode.ErrorUnLockChapter.WithError(err))
+		res.CheckErrorAndResponse(err, errcode.ErrorUnLockChapter)
 		return
 	}
 	res.ToResponse(gin.H{})

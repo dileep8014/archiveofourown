@@ -1,4 +1,4 @@
-import { Button, Checkbox, Form, Input, Tabs } from 'antd';
+import { Button, Checkbox, Form, Input, notification, Tabs } from 'antd';
 import React from 'react';
 import { useModel } from '@@/plugin-model/useModel';
 import './sign.less';
@@ -15,10 +15,11 @@ const LoginForm = (props: { finish: () => void }) => {
   }));
 
   const onFinish = (values: any) => {
-    if (values.rememberme === undefined) {
-      values.rememberme = false;
+    if (values.rememberMe === undefined) {
+      values.rememberMe = false;
     }
-    ProgressOpt(() => signIn(values.username, values.password));
+    // @ts-ignore
+    ProgressOpt(() => signIn(values));
     props.finish();
   };
 
@@ -31,16 +32,19 @@ const LoginForm = (props: { finish: () => void }) => {
           onFinish={onFinish}>
       <Form.Item name="username" rules={
         [{ required: true, message: '用户名不能为空' }]}>
-        <Input defaultValue='shyptr' size={'large'} className="input-prepend restyle" placeholder="用户名 / 邮箱"/>
+        <Input value={localStorage.getItem('currentUser') || ''}
+               size={'large'} className="input-prepend restyle"
+               placeholder="用户名 / 邮箱"/>
       </Form.Item>
       <Form.Item name="password" rules={
         [{ required: true, message: '密码不能为空' }]
       }>
-        <Input type={'password'} className="input-prepend" size={'large'} placeholder="密码"/>
+        <Input value={localStorage.getItem('currentPass') || ''}
+               type={'password'} className="input-prepend" size={'large'} placeholder="密码"/>
       </Form.Item>
       <Form.Item>
-        <Form.Item name="rememberme" valuePropName="checked" className="remember-btn">
-          <Checkbox>记住我</Checkbox>
+        <Form.Item name="rememberMe" valuePropName="checked" className="remember-btn">
+          <Checkbox>记住我,七天内免登录</Checkbox>
         </Form.Item>
         <div className="forgot-btn">
           <a href="/?">
@@ -57,14 +61,20 @@ const LoginForm = (props: { finish: () => void }) => {
 
 const RegisterForm = (props: { finish: () => void }) => {
   const [form] = Form.useForm();
-  const { run } = useRequest(
-    ({ account, email, password }) => userService.SignUp(account, email, password), {
-      manual: true,
-    });
+  const { run } = useRequest(userService.SignUp, {
+    manual: true, onSuccess: (res) => {
+      if (res.code == 0) {
+        notification['success']({
+          message: '注册成功',
+          description: '请您随时关注邮件提醒，我们将会在1-2日内给您发送注册邮件，请按邮件操作完成个人信息填写。',
+        });
+        props.finish();
+      }
+    },
+  });
 
   const onFinish = (values: any) => {
-    run(values);
-    props.finish();
+    run(values.email);
   };
 
 

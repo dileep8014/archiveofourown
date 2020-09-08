@@ -8,6 +8,7 @@ import (
 type ServerSetting struct {
 	RunMode      string
 	HttpPort     string
+	BaseUrl      string
 	ReadTimeOut  time.Duration
 	WriteTimeOut time.Duration
 }
@@ -53,6 +54,14 @@ type MQSetting struct {
 	Username string
 	Password string
 	Host     string
+}
+
+type RedisSetting struct {
+	Password       string
+	Host           string
+	ConnectTimeout int
+	ReadTimeOut    int
+	WriteTimeOut   int
 }
 
 func (s *Setting) ReadSection(k string, v interface{}) error {

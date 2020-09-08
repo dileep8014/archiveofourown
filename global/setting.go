@@ -12,6 +12,7 @@ var (
 	JWTSetting      *setting.JwtSetting
 	EmailSetting    *setting.EmailSetting
 	MQSetting       *setting.MQSetting
+	RedisSetting    *setting.RedisSetting
 )
 
 func SetupSetting() (err error) {
@@ -42,6 +43,10 @@ func SetupSetting() (err error) {
 		return
 	}
 	err = st.ReadSection("MQ", &MQSetting)
+	if err != nil {
+		return
+	}
+	err = st.ReadSection("Redis", &RedisSetting)
 	if err != nil {
 		return
 	}

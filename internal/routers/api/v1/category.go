@@ -23,6 +23,7 @@ func (c Category) Router(api *gin.RouterGroup) {
 // @Tags 分类
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Success 200 {array} service.CategoryResponse "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
@@ -32,7 +33,7 @@ func (c Category) List(ctx *gin.Context) {
 	svc := service.NewService(ctx)
 	categories, err := svc.ListCategories()
 	if err != nil {
-		res.ToErrorResponse(errcode.ErrorListCategoryFail.WithError(err))
+		res.CheckErrorAndResponse(err, errcode.ErrorListCategoryFail)
 		return
 	}
 	res.ToResponse(categories)

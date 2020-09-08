@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/shyptr/archiveofourown/global"
+	"github.com/shyptr/archiveofourown/internal/mq"
 	"github.com/shyptr/archiveofourown/internal/routers"
 	"log"
 	"net/http"
@@ -14,20 +15,29 @@ import (
 )
 
 func init() {
+	// 初始化设置
 	err := global.SetupSetting()
 	if err != nil {
 		log.Fatalln(err)
 	}
+	// 日志
 	global.SetupLogger()
+	// 数据库
 	err = global.SetupDBEngine()
 	if err != nil {
 		log.Fatalln(err)
 	}
-
+	// 链路跟踪
 	err = global.SetupTracer()
 	if err != nil {
 		log.Fatalln(err)
 	}
+	// MQ
+	mq.InitMQ()
+	// trans
+	global.InitValidate()
+	// redis
+	global.SetupRedisCache()
 }
 
 // @title 同人圈
@@ -44,6 +54,10 @@ func main() {
 		WriteTimeout:   global.ServerSetting.WriteTimeOut * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
+	// mq start
+	mqQuit := make(chan struct{})
+	mq.Start(mqQuit)
+	// server start
 	go func() {
 		if err := server.ListenAndServe(); err != nil {
 			log.Fatalf("server.ListenAndServe error: %v", err)
@@ -52,6 +66,7 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt, os.Kill, syscall.SIGTERM)
 	<-quit
+	close(mqQuit)
 	log.Println("Shutting down server...")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()

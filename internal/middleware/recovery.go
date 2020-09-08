@@ -36,7 +36,7 @@ func Recovery() gin.HandlerFunc {
 				if err != nil {
 					logger.Panic().AnErr("panic recover", err).Send()
 				}
-				app.NewResponse(c).ToErrorResponse(errcode.ServerError)
+				app.NewResponse(c).ToErrorResponse(errcode.ServerError.WithError(fmt.Errorf("panic: %v", r)))
 				c.Abort()
 			}
 		}()

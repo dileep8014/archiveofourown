@@ -28,5 +28,28 @@ var (
 
 // college error
 var (
-	ErrorCollegeWorks = NewError(20040001, "查询书单内作品列表失败")
+	ErrorCollegeWorks   = NewError(20040001, "查询书单内作品列表失败")
+	ErrorCollegeList    = NewError(20040002, "查询书单列表失败")
+	ErrorCreateCollege  = NewError(20040003, "创建书单失败")
+	ErrorCollegeAddWork = NewError(20040004, "书单添加作品失败")
+	ErrorCollegeUpdate  = NewError(20040005, "书单更新信息失败")
+	ErrorCollegeDelete  = NewError(20040006, "书单删除失败")
 )
+
+// user error
+var (
+	ErrorEmailExist        = NewError(20050001, "邮箱已被注册")
+	ErrorRegisterUser      = NewError(20050002, "注册失败")
+	ErrorIdentifyUser      = NewError(20050003, "注册验证失败")
+	ErrorCreateUser        = NewError(20050004, "创建用户账户失败")
+	ErrorUsernameExist     = NewError(20050005, "用户名已被使用")
+	ErrorUserNotExist      = NewError(20050006, "用户不存在")
+	ErrorUserPassword      = NewError(20050007, "密码错误")
+	ErrorUserLogin         = NewError(20050008, "登录失败")
+	ErrorUserInfo          = NewError(20050009, "获取用户信息失败")
+	ErrorUserSetting       = NewError(20050010, "获取用户偏好设置失败")
+	ErrorUserUpdate        = NewError(20050011, "修改用户信息失败")
+	ErrorUserUpdateSetting = NewError(20050012, "修改用户偏好设置失败")
+)
+
+var ErrorFileUpload = NewError(20060001, "文件上传失败")

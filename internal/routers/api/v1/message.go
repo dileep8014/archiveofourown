@@ -16,9 +16,10 @@ func (m Message) Router(api gin.IRouter) {
 }
 
 // @Summary 未读私信数
-// @Tags Message
+// @Tags 私信
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Success 200 {int} int "成功"
 // @Failure 400 {object} errcode.Error "请求错误"
 // @Failure 500 {object} errcode.Error "内部错误"
@@ -28,9 +29,10 @@ func (m Message) Unread(ctx *gin.Context) {
 }
 
 // @Summary 查看私信
-// @Tags Message
+// @Tags 私信
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param type path int true "私信类型" Enums(0,1)
 // @Param pageSize query int true "页大小"
 // @Param page query int true "当前页"
@@ -43,9 +45,10 @@ func (m Message) List(ctx *gin.Context) {
 }
 
 // @Summary 发送私信
-// @Tags Message
+// @Tags 私信
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param param body service.MessageRequest true "参数"
 // @Success 200 {string} string "成功"
 // @Failure 400 {object} errcode.Error "请求错误"

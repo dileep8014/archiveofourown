@@ -21,9 +21,10 @@ func (c Calendar) Router(api gin.IRouter) {
 }
 
 // @Summary 获取指定用户的创作日历
-// @Tags Calendar
+// @Tags 创作日历
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "token"
 // @Param userID path int true "用户ID"
 // @Param year query int true "年份"
 // @Param month query int true "月份" mininum(1) maxinum(12)
@@ -41,7 +42,7 @@ func (c Calendar) List(ctx *gin.Context) {
 	}
 	req := service.CalendarRequest{}
 	valid, errs := app.BindAndValid(ctx, &req, ctx.BindQuery)
-	if valid {
+	if !valid {
 		res.ToErrorResponse(errcode.InValidParams.WithDetails(errs.Errors()...))
 		return
 	}
@@ -50,7 +51,7 @@ func (c Calendar) List(ctx *gin.Context) {
 
 	list, err := svc.ListCalendar(int64(userID), req)
 	if err != nil {
-		res.ToErrorResponse(errcode.ErrorListCalendar.WithError(err))
+		res.CheckErrorAndResponse(err, errcode.ErrorListCalendar)
 		return
 	}
 

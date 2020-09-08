@@ -25,12 +25,10 @@ func InitMQ() {
 			From:     global.EmailSetting.From,
 		})
 		pool.New = func() interface{} {
-			log := global.Get()
-			defer global.Put(log)
 			conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s/", global.MQSetting.Username,
 				global.MQSetting.Password, global.MQSetting.Host))
 			if err != nil {
-				log.Error().Caller().AnErr("dial rabbitmq", err).Send()
+				global.Logger.Error().Caller().AnErr("dial rabbitmq", err).Send()
 				defaultMailer.SendMail(
 					global.EmailSetting.To,
 					fmt.Sprintf("连接MQ失败，发生时间: %s", time.Now().Format(time.RFC3339)),
@@ -58,4 +56,52 @@ func putConn(conn *amqp.Connection) {
 	if !conn.IsClosed() {
 		pool.Put(conn)
 	}
+}
+
+func SendMessage(queueName string, body []byte) error {
+	global.Logger.Info().Str(queueName+" mq send", string(body)).Send()
+
+	conn := getConn()
+	defer putConn(conn)
+	channel, err := conn.Channel()
+	if err != nil {
+		global.Logger.Error().Caller().AnErr("open channel", err).Send()
+		return err
+	}
+	defer channel.Close()
+
+	queue, err := channel.QueueDeclare(
+		queueName,
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		global.Logger.Error().Caller().AnErr("queue declare", err).Send()
+		return err
+	}
+
+	err = channel.Publish(
+		"",
+		queue.Name,
+		false,
+		false,
+		amqp.Publishing{
+			DeliveryMode: amqp.Persistent,
+			ContentType:  "text/plain",
+			Body:         body,
+		},
+	)
+	if err != nil {
+		global.Logger.Error().Caller().AnErr("publish message", err).Send()
+		return err
+	}
+	return nil
+}
+
+func Start(quit <-chan struct{}) {
+	go CalendarConsumer{quit: quit}.Start()
+	go RegisterConsumer{quit: quit}.Start()
 }

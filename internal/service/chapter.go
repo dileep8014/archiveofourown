@@ -2,9 +2,11 @@ package service
 
 import (
 	"errors"
+	"github.com/jinzhu/gorm"
 	"github.com/shyptr/archiveofourown/internal/model"
+	"github.com/shyptr/archiveofourown/internal/mq"
+	"github.com/shyptr/archiveofourown/pkg/errcode"
 	"github.com/shyptr/archiveofourown/pkg/errwrap"
-	"gorm.io/gorm"
 	"time"
 )
 
@@ -79,6 +81,15 @@ func (svc Service) GetHistoryChapter(id int64) (list []ChapterHistoryResponse, e
 func (svc Service) NewChapter(req ChapterNewRequest) (err error) {
 	defer errwrap.Wrap(&err, "service.NewChapter")
 
+	// 验证资源所有者
+	work := model.Work{ID: req.WorkID}
+	err = svc.db.Select("user_id").First(&work).Error
+	if err != nil {
+		return
+	}
+	if work.UserId != svc.ctx.GetInt64("me.id") {
+		return errcode.ErrorPermission
+	}
 	result := svc.db.Create(&model.Chapter{
 		WorkId:       req.WorkID,
 		Title:        req.Title,
@@ -107,7 +118,7 @@ func (svc Service) SaveChapter(id int64, req ChapterSaveRequest) (err error) {
 		}
 		if chapter.Status == 1 {
 			//添加新的发布版本
-			result := tx.Create(&model.Chapter{
+			newChapter := model.Chapter{
 				WorkId:       chapter.WorkId,
 				Status:       1,
 				Title:        req.Title,
@@ -115,8 +126,18 @@ func (svc Service) SaveChapter(id int64, req ChapterSaveRequest) (err error) {
 				Seq:          chapter.Seq,
 				Version:      chapter.Version + 1,
 				SubsectionId: chapter.SubsectionId,
-			})
-			return CheckError(result, Insert_OP)
+			}
+			result := tx.Create(&newChapter)
+			err := CheckError(result, Insert_OP)
+			if err != nil {
+				return err
+			}
+			// 发送消息队列
+			go mq.CalendarProvider{}.Send(mq.CalendarMessage{
+				ChapterID: newChapter.ID,
+				UserID:    svc.ctx.Value("me.id").(int64),
+				Date:      time.Now(),
+			}, time.NewTimer(20*time.Second))
 		}
 		return nil
 	})
@@ -146,7 +167,16 @@ func (svc Service) PublishChapter(id int64) (err error) {
 			}
 			chapter.Status = 1
 			result := tx.Model(&chapter).Updates(chapter)
-			return CheckError(result, Update_OP)
+			err = CheckError(result, Update_OP)
+			if err != nil {
+				return err
+			}
+			// 发送消息队列
+			go mq.CalendarProvider{}.Send(mq.CalendarMessage{
+				ChapterID: chapter.ID,
+				UserID:    svc.ctx.Value("me.id").(int64),
+				Date:      time.Now(),
+			}, time.NewTimer(20*time.Second))
 		}
 		return nil
 	})

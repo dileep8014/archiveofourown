@@ -1,10 +1,10 @@
 package service
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/shyptr/archiveofourown/internal/model"
 	"github.com/shyptr/archiveofourown/pkg/app"
 	"github.com/shyptr/archiveofourown/pkg/errwrap"
-	"gorm.io/gorm"
 )
 
 // College create request example
@@ -80,6 +80,70 @@ func (svc Service) ListCollegeWorks(id int64) (res CollegeWorksPageResponse, err
 			}
 		}
 		return nil
+	})
+	return
+}
+
+// CollegeList: 书单列表
+func (svc Service) CollegeList(userId int64) (res CollegePageResponse, err error) {
+	defer errwrap.Wrap(&err, "service.CollegeList")
+
+	size, offset := app.GetPage(svc.ctx)
+	result := svc.db.Model(&model.College{}).Where("user_id=?", userId).Limit(size).Offset(offset).Find(&res.List).Count(&res.Total)
+	err = CheckError(result, Select_OP)
+	return
+}
+
+// CreateCollege: 创建书单
+func (svc Service) CreateCollege(req CollegeCreateRequest) (err error) {
+	defer errwrap.Wrap(&err, "service.CreateCollege")
+
+	result := svc.db.Create(&model.College{
+		UserId:    svc.ctx.GetInt64("me.id"),
+		Title:     req.Title,
+		Introduce: req.Introduce,
+		WorksNums: 0,
+	})
+	err = CheckError(result, Insert_OP)
+	return
+}
+
+// CollegeAddWork: 添加作品
+func (svc Service) CollegeAddWork(id, workId int64) (err error) {
+	defer errwrap.Wrap(&err, "service.CollegeAddWork")
+
+	err = svc.db.Transaction(func(tx *gorm.DB) error {
+		result := tx.Create(&model.CollegeWork{CollegeId: id, WorkId: workId})
+		err := CheckError(result, Insert_OP)
+		if err != nil {
+			return err
+		}
+		result = tx.Model(&model.College{}).Update("works_nums", "works_nums + 1")
+		return CheckError(result, Update_OP)
+	})
+	return
+}
+
+// UpdateCollege: 更新书单信息
+func (svc Service) UpdateCollege(id int64, req CollegeUpdateRequest) (err error) {
+	defer errwrap.Wrap(&err, "service.UpdateCollege")
+
+	result := svc.db.Model(&model.College{}).Where("id=?", id).Updates(&req)
+	err = CheckError(result, Update_OP)
+	return
+}
+
+// DeleteCollege: 删除书单
+func (svc Service) DeleteCollege(id int64) (err error) {
+	defer errwrap.Wrap(&err, "service.DeleteCollege")
+
+	err = svc.db.Transaction(func(tx *gorm.DB) error {
+		result := tx.Delete(&model.CollegeWork{CollegeId: id})
+		if result.Error != nil {
+			return result.Error
+		}
+		result = tx.Delete(&model.College{ID: id})
+		return CheckError(result, Delete_OP)
 	})
 	return
 }

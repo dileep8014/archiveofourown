@@ -1,5 +1,18 @@
 import ImgCrop from 'antd-img-crop';
-import { Avatar, Button, Descriptions, Input, message, Radio, Space, Spin, Upload } from 'antd';
+import {
+  Avatar,
+  Button,
+  Descriptions,
+  Form,
+  Input,
+  message,
+  Modal,
+  notification,
+  Radio,
+  Space,
+  Spin,
+  Upload,
+} from 'antd';
 import styles from './index.less';
 import Field, { ProFieldFCMode } from '@ant-design/pro-field';
 import ButtonGroup from 'antd/es/button/button-group';
@@ -9,13 +22,22 @@ import React, { useEffect, useState } from 'react';
 import { useModel } from '@@/plugin-model/useModel';
 import { UserModelState } from '@/models/user';
 import { LoadingOutlined, UploadOutlined } from '@ant-design/icons';
+import { baseurl } from '@/service/request';
+import { UploadChangeParam } from 'antd/lib/upload/interface';
+import { useRequest } from 'ahooks';
+import { userService } from '@/service/user';
 
 
-function getBase64(img: Blob, callback: { (imageUrl: any): void; (arg0: string | ArrayBuffer | null): any; }) {
-  const reader = new FileReader();
-  reader.addEventListener('load', () => callback(reader.result));
-  reader.readAsDataURL(img);
-}
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 6 },
+    sm: { span: 6 },
+  },
+  wrapperCol: {
+    xs: { span: 14 },
+    sm: { span: 14 },
+  },
+};
 
 export default function UserInfo() {
 
@@ -24,10 +46,33 @@ export default function UserInfo() {
     setUser: model.setUser,
   }));
 
+  const { run: runPass } = useRequest(userService.UpdatePassword, {
+    manual: true, onSuccess: res => {
+      if (res.code == 0) {
+        message.success("修改成功")
+        setUpdatePass(false);
+      }
+    },
+  });
+  const { run: runEmail } = useRequest(userService.UpdateEmail, {
+    manual: true, onSuccess: res => {
+      if (res.code == 0) {
+        message.success("修改成功")
+        setUpdateEmail(false);
+      }
+    },
+  });
+
   const [userInfo, setUserInfo] = useState<UserModelState>(null);
   const [imgBtn, setImgBtn] = useState(false);
   const [imgLoading, setImgLoading] = useState(false);
+  const [updateEmail, setUpdateEmail] = useState(false);
+  const [updatePass, setUpdatePass] = useState(false);
   const [state, setState] = useState<ProFieldFCMode>('read');
+
+  const [form1] = Form.useForm();
+  const [form2] = Form.useForm();
+
 
   useEffect(() => {
     if (user) {
@@ -44,17 +89,18 @@ export default function UserInfo() {
     return isLt2M;
   };
 
-  const handleChange = (info: any) => {
+  const handleChange = (info: UploadChangeParam) => {
     if (info.file.status === 'uploading') {
       setImgLoading(true);
       return;
     }
     if (info.file.status === 'done') {
-      getBase64(info.file.originFileObj, (imageUrl: any) => {
-          setImgLoading(false);
-          setUser(user && { ...user, avatar: imageUrl });
-        },
-      );
+      setImgLoading(false);
+      setUser({ avatar: info.file.response?.data });
+    }
+    if (info.file.status == 'error') {
+      setImgLoading(false);
+      notification['error']({ message: info.file.response.msg, description: info.file.response.details });
     }
   };
 
@@ -68,10 +114,10 @@ export default function UserInfo() {
            onMouseEnter={() => setImgBtn(!imgLoading)}
            onMouseLeave={() => setImgBtn(false)}>
         <ImgCrop rotate modalOk='确定' modalCancel='取消' modalTitle='头像裁剪'>
-          <Upload name='头像'
+          <Upload name='file'
                   accept='image/*'
                   showUploadList={false}
-                  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                  action={`${baseurl}/api/v1/upload`}
                   beforeUpload={beforeUpload}
                   onChange={handleChange}
                   openFileDialogOnClick={imgBtn}
@@ -84,7 +130,7 @@ export default function UserInfo() {
           </Upload>
         </ImgCrop>
       </div>}
-             extra={<h1 className={styles.userName}>{user?.name}</h1>} headerBordered>
+             extra={<h1 className={styles.userName}>{user?.username}</h1>} headerBordered>
       <Radio.Group onChange={(e) => setState(e.target.value as ProFieldFCMode)} value={state}>
         <Radio value="read">只读</Radio>
         <Radio value="edit">编辑</Radio>
@@ -92,52 +138,75 @@ export default function UserInfo() {
       <ButtonGroup>
         <Button disabled={state == 'read'} onClick={() => setUserInfo(user)}>取消</Button>
         <Button disabled={state == 'read'} type={'primary'} onClick={() => {
-          if (userInfo?.phone) {
-            if (!(/^1[3456789]\d{9}$/.test(userInfo.phone.toString()))) {
-              message.warning('手机号码有误，请重填');
-              // @ts-ignore
-              setUserInfo({ ...userInfo, phone: user?.phone });
-              return;
-            }
-          }
-          setUser(userInfo);
+          setState('read');
+          setUser({ username: userInfo?.username, introduce: userInfo?.introduce, gender: userInfo?.gender });
         }}>修改</Button>
       </ButtonGroup>
       <Space align={'end'} style={{ float: 'right' }}>
-        <Button style={{ marginLeft: 10 }} type={'primary'}>修改密码</Button>
-        <Button style={{ marginLeft: 10 }} type={'primary'}>修改邮箱账户</Button>
+        <Button style={{ marginLeft: 10 }} type={'primary'} onClick={() => setUpdatePass(true)}>修改密码</Button>
+        <Modal visible={updatePass} title='修改用户密码' onCancel={() => setUpdatePass(false)} footer={null}>
+          <Form {...formItemLayout} form={form1}
+                onFinish={values => runPass({ oldPassword: values.oldPassword, password: values.password })}>
+            <Form.Item label='旧密码' name='oldPassword' rules={[{ required: true }]} hasFeedback>
+              <Input.Password/>
+            </Form.Item>
+            <Form.Item label='新密码' name='password' rules={[{ required: true }, { min: 8, max: 20 }]} hasFeedback>
+              <Input.Password/>
+            </Form.Item>
+            <Form.Item label='确认新密码' name='confirm' dependencies={['password']}
+                       rules={[{ required: true }, { min: 8, max: 20 }, ({ getFieldValue }) => ({
+                         validator(rule, value) {
+                           if (!value || getFieldValue('password') === value) {
+                             return Promise.resolve();
+                           }
+                           return Promise.reject('两次密码不一致');
+                         },
+                       })]} hasFeedback>
+              <Input.Password/>
+            </Form.Item>
+            <Form.Item labelCol={{ span: 0 }} wrapperCol={{ span: 24 }} style={{ textAlign: 'center' }}>
+              <Button type="primary" htmlType="submit" style={{ width: '40%' }}>确认修改</Button>
+            </Form.Item>
+          </Form>
+        </Modal>
+        <Button style={{ marginLeft: 10 }} type={'primary'} onClick={() => setUpdateEmail(true)}>修改邮箱账户</Button>
+        <Modal visible={updateEmail} title='修改用户邮箱' onCancel={() => setUpdateEmail(false)} footer={null}>
+          <Form {...formItemLayout} form={form2}
+                onFinish={values => runEmail({ email: values.email, password: values.password })}>
+            <Form.Item label='密码' name='password' rules={[{ required: true }]} hasFeedback>
+              <Input.Password/>
+            </Form.Item>
+            <Form.Item label='新的邮箱' name='email' rules={[{ required: true }, { type: 'email' }]} hasFeedback>
+              <Input type={'email'}/>
+            </Form.Item>
+            <Form.Item labelCol={{ span: 0 }} wrapperCol={{ span: 24 }} style={{ textAlign: 'center' }}>
+              <Button type="primary" htmlType="submit" style={{ width: '40%' }}>确认修改</Button>
+            </Form.Item>
+          </Form>
+        </Modal>
       </Space>
       <br/>
       <br/>
       <Descriptions size='middle' column={2}>
         <Descriptions.Item label="笔名">
-          <Field text={user?.name} value={userInfo?.name} mode={state}
-                 formItemProps={{ maxlength: 10 }}
-                 onChange={(e) => setUserInfo(userInfo && { ...userInfo, name: e.target.value })}/>
-        </Descriptions.Item>
-        <Descriptions.Item label="联系电话">
-          <Field text={user?.phone} value={userInfo?.phone} mode={state}
-                 onChange={(e) => setUserInfo(userInfo && { ...userInfo, phone: e.target.value })}/>
+          <Field text={user?.username} value={userInfo?.username} mode={state}
+                 formItemProps={{ maxLength: 10 }}
+                 onChange={(e) => setUserInfo(userInfo && { ...userInfo, username: e.target.value })}/>
         </Descriptions.Item>
         <Descriptions.Item label="邮箱">
           <Field text={user?.email} mode={'read'}/>
         </Descriptions.Item>
         <Descriptions.Item label="性别">
-          <Field text={user?.gender} value={userInfo?.gender} mode={state}
-                 valueEnum={{ secret: { text: '保密' }, man: { text: '男' }, woman: { text: '女' } }}
+          <Field text={user?.gender.toString()} value={userInfo?.gender.toString()} mode={state}
+                 valueEnum={{ '0': { text: '保密' }, '1': { text: '男' }, '2': { text: '女' } }}
                  onChange={(e) => {
+                   console.log(e);
                    if (!e) {
-                     setUserInfo(userInfo && { ...userInfo, gender: 'secret' });
+                     setUserInfo(userInfo && { ...userInfo, gender: 0 });
                    } else {
-                     setUserInfo(userInfo && { ...userInfo, gender: e.target.value });
+                     setUserInfo(userInfo && { ...userInfo, gender: parseInt(e) });
                    }
                  }}
-          />
-        </Descriptions.Item>
-        <Descriptions.Item label="生日">
-          <Field text={user?.birthday} value={userInfo?.birthday && moment(userInfo?.birthday)}
-                 valueType={'date'} mode={state}
-                 onChange={(e) => setUserInfo(userInfo && { ...userInfo, birthday: e })}
           />
         </Descriptions.Item>
         <Descriptions.Item label="个人简介">
@@ -145,13 +214,13 @@ export default function UserInfo() {
                  formItemProps={{
                    style: { width: 400 },
                    autoSize: { minRows: 4, maxRows: 4 },
-                   maxlength: 200,
+                   maxLength: 200,
                  }}
                  onChange={(e) => setUserInfo(userInfo && { ...userInfo, introduce: e.target.value })}
           />
         </Descriptions.Item>
         <Descriptions.Item label="注册时间">
-          <Field text={moment().format('YYYY年 MM月 DD日')} mode={'read'}/>
+          <Field text={moment(user?.createdAt).format('YYYY年 MM月 DD日')} mode={'read'}/>
         </Descriptions.Item>
       </Descriptions>
     </ProCard>
